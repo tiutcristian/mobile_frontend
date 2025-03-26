@@ -106,10 +106,12 @@ export default function Form() {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+
+		var imagePlaceholder = "/images/placeholder.png";
 		
 		const newListing: Listing = {
 			id: Date.now(),
-			image: (image || "https://www.shutterstock.com/image-vector/flat-car-picture-placeholder-symbol-600nw-2366856295.jpg"),
+			image: image || imagePlaceholder,
 			title: title,
 			price: price,
 			make: make,
