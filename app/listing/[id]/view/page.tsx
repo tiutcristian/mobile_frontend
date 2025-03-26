@@ -4,12 +4,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useListings } from "@/app/context/ListingsContext";
+import { useParams } from "next/navigation";
 
-export default function Page(props : { params : { id : string } }) {
+export default function Page() {
     
-    const { state, dispatch } = useListings();
+    const { state } = useListings();
 
-    const listing = state.listings.find((l) => l.id === parseInt(props.params.id));
+    let params = useParams();
+    const listing = state.listings.find((l) => l.id === parseInt(params.id as string));
     if (!listing) {
         return (
             <main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
