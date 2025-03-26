@@ -4,6 +4,7 @@ import { faEye, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useState } from "react";
+import CarAgeBadge from "./CarAgeBadge";
 
 interface ListingCardProps { listing : Listing; }
 
@@ -18,8 +19,9 @@ export default function ListingCard(props : ListingCardProps) {
   
     return (
         <div
-            className="flex flex-col sm:flex-row items-center rounded-xl dark:bg-gray-800 justify-between"
+            className="relative flex flex-col sm:flex-row items-center rounded-xl dark:bg-gray-800 justify-between"
         >
+            <CarAgeBadge listing={props.listing} />
             <img
                 className="object-cover sm:w-1/4 h-64 rounded-t-xl sm:rounded-none sm:rounded-s-xl"
                 src={props.listing.image}
