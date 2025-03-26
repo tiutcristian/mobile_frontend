@@ -1,0 +1,102 @@
+const filterListings = require('./filterFunction');
+
+describe("Testing filterActiveItems", () => {
+    const listings = [
+        {
+          "id": 1,
+          "image": "/images/corolla.png",
+          "title": "Toyota Corolla 2020 for sale",
+          "price": 20000,
+          "make": "Toyota",
+          "model": "Corolla",
+          "description": "For Sale: 2020 Toyota Corolla - Reliable & Fuel Efficient! Looking for a dependable and fuel-efficient sedan? This 2020 Toyota Corolla is the perfect choice! With its sleek design, comfortable interior, and advanced safety features, it's ideal for daily commutes or long drives.",
+          "year": 2020,
+          "mileage": 10000,
+          "engineSize": 1.8,
+          "horsepower": 140,
+          "transmission": "Automatic",
+          "fuelType": "Diesel"
+        },
+        {
+          "id": 2,
+          "image": "/images/yaris.png",
+          "title": "Toyota Yaris 2019 for sale",
+          "price": 15000,
+          "make": "Toyota",
+          "model": "Yaris",
+          "description": "This is a 2019 Toyota Yaris for sale",
+          "year": 2019,
+          "mileage": 20000,
+          "engineSize": 1.5,
+          "horsepower": 110,
+          "transmission": "Manual",
+          "fuelType": "Petrol"
+        },
+        {
+          "id": 3,
+          "image": "/images/camry.png",
+          "title": "Toyota Camry 2018 for sale",
+          "price": 25000,
+          "make": "Toyota",
+          "model": "Camry",
+          "description": "This is a 2018 Toyota Camry for sale",
+          "year": 2018,
+          "mileage": 30000,
+          "engineSize": 2.5,
+          "horsepower": 200,
+          "transmission": "Automatic",
+          "fuelType": "Hybrid"
+        },
+        {
+          "id": 4,
+          "image": "/images/rav4.png",
+          "title": "Toyota RAV4 2017 for sale",
+          "price": 30000,
+          "make": "Toyota",
+          "model": "RAV4",
+          "description": "This is a 2017 Toyota RAV4 for sale",
+          "year": 2017,
+          "mileage": 40000,
+          "engineSize": 2,
+          "horsepower": 150,
+          "transmission": "Automatic",
+          "fuelType": "Diesel"
+        }
+    ];
+    
+    test('Testing filterListings - returns only Corolla', () => {
+        const search = 'cor';
+        const result = filterListings(listings, search);
+        expect(result).toEqual(
+            [
+                {
+                    "id": 1,
+                    "image": "/images/corolla.png",
+                    "title": "Toyota Corolla 2020 for sale",
+                    "price": 20000,
+                    "make": "Toyota",
+                    "model": "Corolla",
+                    "description": "For Sale: 2020 Toyota Corolla - Reliable & Fuel Efficient! Looking for a dependable and fuel-efficient sedan? This 2020 Toyota Corolla is the perfect choice! With its sleek design, comfortable interior, and advanced safety features, it's ideal for daily commutes or long drives.",
+                    "year": 2020,
+                    "mileage": 10000,
+                    "engineSize": 1.8,
+                    "horsepower": 140,
+                    "transmission": "Automatic",
+                    "fuelType": "Diesel"
+                }
+            ]
+        );
+    });
+    
+    test('Testing filterListings - returns all the listings', () => {
+        const search2 = 'toy';
+        const result2 = filterListings(listings, search2);
+        expect(result2).toEqual(listings);
+    });
+    
+    test('Testing filterListings - returns no listing', () => {
+        const search3 = 'toyt';
+        const result3 = filterListings(listings, search3);
+        expect(result3).toEqual([]);
+    });
+});
