@@ -6,7 +6,7 @@ import jsonListings from "../listings.json";
 
 const importedListings = jsonListings as Listing[];
 
-function listingReducer(state: ListingsStateType, action: ActionType): ListingsStateType {
+export function listingReducer(state: ListingsStateType, action: ActionType): ListingsStateType {
   switch (action.type) {
     case "CREATE":
       return {
@@ -35,7 +35,7 @@ function listingReducer(state: ListingsStateType, action: ActionType): ListingsS
   }
 }
 
-const ListingContext = createContext<
+export const ListingContext = createContext<
   | { state: ListingsStateType; dispatch: React.Dispatch<ActionType> }
   | undefined
 >(undefined);

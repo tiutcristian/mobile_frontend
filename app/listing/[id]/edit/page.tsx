@@ -18,7 +18,6 @@ export default function Form() {
 		);
 	}
 
-	// form state
 	const [image, setImage] = useState<string>(listing.image);
 	const [title, setTitle] = useState<string>(listing.title);
 	const [price, setPrice] = useState<number>(listing.price);

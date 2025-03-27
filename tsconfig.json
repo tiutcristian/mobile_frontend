@@ -20,8 +20,12 @@
     ],
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "types": [
+      "jest", 
+      "@testing-library/jest-dom"
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/ListingsContext.tsx", "app/context/ListingsContext.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/ListingsContext.tsx", "app/context/ListingsContext.tsx", "__tests__/context/ListingsContext.test.tsx", "jest.config.js"],
   "exclude": ["node_modules"]
 }
