@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import { FuelType, Listing, Transmission } from "../../../types";
-import { useListings } from "../../../context/ListingsContext";
 import { useParams } from "next/navigation";
 
 export default function Form() {
-	const { state, dispatch } = useListings();
 
 	let params = useParams();
-	const listing = state.listings.find((l) => l.id === parseInt(params.id as string));
+	const listingId = parseInt(params.id as string)
+
+	// TODO: Fetch the listing from the API
+	const [listing, setListing] = useState<Listing | null>(null);
+	
+
 	if (!listing) {
 		return (
 			<main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
@@ -18,7 +21,7 @@ export default function Form() {
 		);
 	}
 
-	const [image, setImage] = useState<string>(listing.image);
+	const [image, setImage] = useState<string>(listing.imageUrl);
 	const [title, setTitle] = useState<string>(listing.title);
 	const [price, setPrice] = useState<number>(listing.price);
 	const [make, setMake] = useState<string>(listing.make);
@@ -123,7 +126,7 @@ export default function Form() {
 
 		const updatedListing: Listing = {
 			id: listing.id,
-			image: image || imagePlaceholder,
+			imageUrl: image || imagePlaceholder,
 			title: title,
 			price: price,
 			make: make,
@@ -138,7 +141,7 @@ export default function Form() {
 		};
 
 		if (validateListing(updatedListing)) {
-			dispatch({ type: "UPDATE", payload: updatedListing });
+			// TODO: PUT API call to update the listing
 			window.history.back();
 		}
 	}

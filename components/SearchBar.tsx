@@ -1,11 +1,11 @@
-import { useListings } from "@/app/context/ListingsContext";
+// import { useListings } from "@/app/context/ListingsContext";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
 export default function SearchBar() {
     const [search, setSearch] = useState("");
-    const { state, dispatch } = useListings();
+    // const { state, dispatch } = useListings();
 
     return (
         <div className="relative w-full max-w-6xl">
@@ -19,9 +19,9 @@ export default function SearchBar() {
             <button 
                 type="submit" 
                 className="absolute top-0 end-0 p-2.5 h-full text-white bg-blue-700 rounded-e-lg hover:bg-blue-600 cursor-pointer"
-                onClick={() => 
-                    dispatch({ type: "FILTER", payload: search })
-                }
+                // onClick={() => 
+                    // dispatch({ type: "FILTER", payload: search })
+                // }
             >
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
             </button>

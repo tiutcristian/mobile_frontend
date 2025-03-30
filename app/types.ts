@@ -12,7 +12,7 @@ export enum FuelType {
 
 export type Listing = {
     id : number;
-    image : string;
+    imageUrl : string;
 	title : string;
     price : number;
     make : string;

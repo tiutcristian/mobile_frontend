@@ -3,15 +3,42 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useListings } from "@/app/context/ListingsContext";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Listing } from "@/app/types";
 
 export default function Page() {
     
-    const { state } = useListings();
 
     let params = useParams();
-    const listing = state.listings.find((l) => l.id === parseInt(params.id as string));
+    const listingId = parseInt(params.id as string);
+    const [listing, setListing] = useState<Listing | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+    const fetchListing = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+                method: 'GET',
+                headers: {
+                    'x-api-key': 'mobile',
+                },
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch listing');
+            }
+            const data = await response.json();
+            setListing(data);
+            setLoading(false);
+        } catch (error) {
+            setError(error instanceof Error ? error : new Error(String(error)));
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchListing();
+    }
+    , [listingId]);
+
     if (!listing) {
         return (
             <main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
@@ -30,7 +57,7 @@ export default function Page() {
                 <FontAwesomeIcon icon={faChevronLeft} />
                 Back to Dashboard
             </Link>
-            <img className="w-1/3 object-cover rounded-xl" src={listing.image} alt={listing.title} />
+            <img className="w-1/3 object-cover rounded-xl" src={listing.imageUrl} alt={listing.title} />
             <div className="flex align-center justify-between gap-4 w-full max-w-6xl p-8 rounded-xl dark:bg-gray-800">
                 <h1 className="text-4xl font-semibold text-gray-900 dark:text-white">{listing.title}</h1>
                 <p className="text-2xl text-gray-700 dark:text-gray-400 font-medium">${listing.price}</p>

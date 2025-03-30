@@ -1,7 +1,6 @@
 'use client';
 import { useState } from "react";
 import { FuelType, Listing, Transmission } from "../types";
-import { useListings } from "../context/ListingsContext";
 
 export default function Form() {
 	// form state
@@ -18,7 +17,6 @@ export default function Form() {
 	const [transmission, setTransmission] = useState<Transmission>(Transmission.MANUAL);
 	const [fuelType, setFuelType] = useState<FuelType>(FuelType.PETROL);
 
-	const { state, dispatch } = useListings();
 
 
 	const formValidation = {
@@ -111,7 +109,7 @@ export default function Form() {
 		
 		const newListing: Listing = {
 			id: Date.now(),
-			image: image || imagePlaceholder,
+			imageUrl: image || imagePlaceholder,
 			title: title,
 			price: price,
 			make: make,
@@ -126,7 +124,6 @@ export default function Form() {
 		};
 		
 		if ( validateListing(newListing) ) {
-			dispatch({ type: "CREATE", payload: newListing });
 			window.history.back();
 		}
 	}
