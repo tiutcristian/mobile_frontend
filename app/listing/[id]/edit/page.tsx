@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FuelType, Listing, Transmission } from "../../../types";
 import { useParams } from "next/navigation";
 
@@ -11,8 +11,60 @@ export default function Form() {
 
 	// TODO: Fetch the listing from the API
 	const [listing, setListing] = useState<Listing | null>(null);
+
+	const [image, setImage] = useState<string>(listing ? listing.imageUrl : "/images/placeholder.png");
+	const [title, setTitle] = useState<string>(listing ? listing.title : "");
+	const [price, setPrice] = useState<number>(listing ? listing.price : 0);
+	const [make, setMake] = useState<string>(listing ? listing.make : "");
+	const [model, setModel] = useState<string>(listing ? listing.model : "");
+	const [description, setDescription] = useState<string>(listing ? listing.description : "");
+	const [year, setYear] = useState<number>(listing ? listing.year : 0);
+	const [mileage, setMileage] = useState<number>(listing ? listing.mileage : 0);
+	const [engineSize, setEngineSize] = useState<number>(listing ? listing.engineSize : 0);
+	const [horsepower, setHorsepower] = useState<number>(listing ? listing.horsepower : 0);
+	const [transmission, setTransmission] = useState<Transmission>(listing ? listing.transmission : Transmission.MANUAL);
+	const [fuelType, setFuelType] = useState<FuelType>(listing ? listing.fuelType : FuelType.PETROL);
 	
 
+	useEffect(() => {
+		const fetchListing = async () => {
+			const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+				method: 'GET',
+				headers: {
+					'x-api-key': 'mobile',
+				},
+			})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Listing not found');
+				}
+				return response.json();
+			})
+			.then((data) => {
+				setListing(data);
+				setImage(data.imageUrl);
+				setTitle(data.title);
+				setPrice(data.price);
+				setMake(data.make);
+				setModel(data.model);
+				setDescription(data.description);
+				setYear(data.year);
+				setMileage(data.mileage);
+				setEngineSize(data.engineSize);
+				setHorsepower(data.horsepower);
+				setTransmission(data.transmission);
+				setFuelType(data.fuelType);
+			})
+			.catch((error) => {
+				console.error('Error fetching listing:', error);
+				setListing(null);
+			});
+		};
+		fetchListing();
+	}
+	, [listingId]);
+
+	
 	if (!listing) {
 		return (
 			<main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
@@ -20,19 +72,6 @@ export default function Form() {
 			</main>
 		);
 	}
-
-	const [image, setImage] = useState<string>(listing.imageUrl);
-	const [title, setTitle] = useState<string>(listing.title);
-	const [price, setPrice] = useState<number>(listing.price);
-	const [make, setMake] = useState<string>(listing.make);
-	const [model, setModel] = useState<string>(listing.model);
-	const [description, setDescription] = useState<string>(listing.description);
-	const [year, setYear] = useState<number>(listing.year);
-	const [mileage, setMileage] = useState<number>(listing.mileage);
-	const [engineSize, setEngineSize] = useState<number>(listing.engineSize);
-	const [horsepower, setHorsepower] = useState<number>(listing.horsepower);
-	const [transmission, setTransmission] = useState<Transmission>(listing.transmission);
-	const [fuelType, setFuelType] = useState<FuelType>(listing.fuelType);
 
 
 	const formValidation = {
@@ -124,26 +163,34 @@ export default function Form() {
 
 		var imagePlaceholder = "/images/placeholder.png";
 
-		const updatedListing: Listing = {
-			id: listing.id,
-			imageUrl: image || imagePlaceholder,
-			title: title,
-			price: price,
-			make: make,
-			model: model,
-			description: description,
-			year: year,
-			mileage: mileage,
-			engineSize: engineSize,
-			horsepower: horsepower,
-			transmission: transmission,
-			fuelType: fuelType,
-		};
+		fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+			method: 'PUT',
+			headers: {
+				'x-api-key': 'mobile',
+				'Content-Type': 'application/json',
+			},
+			body: `
+				{
+					"id": ${listingId},
+					"userId": 1,
+					"imageUrl": "${image ? image : imagePlaceholder}",
+					"title": "${title}",
+					"price": ${price},
+					"make": "${make}",
+					"model": "${model}",
+					"description": "${description}",
+					"year": ${year},
+					"mileage": ${mileage},
+					"engineSize": ${engineSize},
+					"horsepower": ${horsepower},
+					"transmission": "${transmission}",
+					"fuelType": "${fuelType}"
+				}
+			`,
+		});
 
-		if (validateListing(updatedListing)) {
-			// TODO: PUT API call to update the listing
-			window.history.back();
-		}
+
+		window.history.back();
 	}
 
 	return (
@@ -237,10 +284,10 @@ export default function Form() {
 						value={fuelType}
 						onChange={e => setFuelType(e.target.value as FuelType)}
 					>
-						<option value={FuelType.PETROL}>Petrol</option>
-						<option value={FuelType.DIESEL}>Diesel</option>
-						<option value={FuelType.ELECTRIC}>Electric</option>
-						<option value={FuelType.HYBRID}>Hybrid</option>
+						<option value={FuelType.PETROL}>PETROL</option>
+						<option value={FuelType.DIESEL}>DIESEL</option>
+						<option value={FuelType.ELECTRIC}>ELECTRIC</option>
+						<option value={FuelType.HYBRID}>HYBRID</option>
 					</select>
 				</div>
 				<div className="flex flex-col">
@@ -250,8 +297,8 @@ export default function Form() {
 						value={transmission}
 						onChange={e => setTransmission(e.target.value as Transmission)}
 					>
-						<option value={Transmission.MANUAL}>Manual</option>
-						<option value={Transmission.AUTOMATIC}>Automatic</option>
+						<option value={Transmission.MANUAL}>MANUAL</option>
+						<option value={Transmission.AUTOMATIC}>AUTOMATIC</option>
 					</select>
 				</div>
 				<div>

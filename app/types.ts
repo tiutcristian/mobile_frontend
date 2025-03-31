@@ -1,13 +1,13 @@
 export enum Transmission {
-    MANUAL = "Manual",
-    AUTOMATIC = "Automatic",
+    MANUAL = "MANUAL",
+    AUTOMATIC = "AUTOMATIC",
 }
 
 export enum FuelType {
-    PETROL = "Petrol",
-    DIESEL = "Diesel",
-    ELECTRIC = "Electric",
-    HYBRID = "Hybrid",
+    PETROL = "PETROL",
+    DIESEL = "DIESEL",
+    ELECTRIC = "ELECTRIC",
+    HYBRID = "HYBRID",
 }
 
 export type Listing = {
