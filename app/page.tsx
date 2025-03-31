@@ -56,6 +56,33 @@ export default function Home() {
 				});
 		}
 	};
+
+	const handleSearch = (search: string) => {
+		const params = new URLSearchParams({
+			'page': '0',
+			'size': '10',
+			'title': search,
+		});
+		
+		setLoading(true);
+
+		fetch(`http://localhost:8080/api/v1/listings/search?${params}`, {
+			method: 'GET',
+			headers: {
+				'x-api-key': 'mobile',
+			},
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Failed to fetch data');
+				}
+				return response.json();
+			}
+			)
+			.then((data) => setListings(data.content))
+			.then(() => setLoading(false))
+			.catch((error) => console.error('Error fetching data:', error));
+	}
 		
 	if (loading) {
 		return (
@@ -72,7 +99,7 @@ export default function Home() {
 
 	return (
 		<main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
-			<SearchBar />
+			<SearchBar handleSearch={handleSearch}/>
 
 			<Link 
 				className="fixed bottom-8 right-8 bg-blue-700 hover:bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer"
