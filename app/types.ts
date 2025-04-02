@@ -26,10 +26,15 @@ export type Listing = {
     fuelType : FuelType;
 };
 
-export type ListingsStateType = { listings: Listing[]; };
+export enum NetworkState {
+    NETWORK_DOWN = "NETWORK_DOWN",
+    SERVER_DOWN = "SERVER_DOWN",
+    UP = "UP",
+}
 
-export type ActionType =
-  | { type: "CREATE"; payload: Listing }
-  | { type: "UPDATE"; payload: Listing }
-  | { type: "DELETE"; payload: number }
-  | { type: "FILTER"; payload: string };
+export type NetworkStateType = { 
+    networkState: NetworkState,
+};
+
+export type NetworkActionType =
+    | { type: "UPDATE"; payload: { networkState: NetworkState } }
