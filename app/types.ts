@@ -11,19 +11,19 @@ export enum FuelType {
 }
 
 export type Listing = {
-    id : number;
-    imageUrl : string;
-	title : string;
-    price : number;
-    make : string;
-    model : string;
-	description : string;
-    year : number;
-    mileage : number;
-    engineSize : number;
-    horsepower : number;
-    transmission : Transmission;
-    fuelType : FuelType;
+    id: number;
+    imageUrl: string;
+    title: string;
+    price: number;
+    make: string;
+    model: string;
+    description: string;
+    year: number;
+    mileage: number;
+    engineSize: number;
+    horsepower: number;
+    transmission: Transmission;
+    fuelType: FuelType;
 };
 
 export enum NetworkState {
@@ -32,9 +32,19 @@ export enum NetworkState {
     UP = "UP",
 }
 
-export type NetworkStateType = { 
+export type NetworkStateType = {
     networkState: NetworkState,
 };
 
-export type NetworkActionType =
-    | { type: "UPDATE"; payload: { networkState: NetworkState } }
+export type NetworkActionType = { 
+    type: "UPDATE",
+    payload: { 
+        networkState: NetworkState,
+    } 
+}
+
+export enum LocalStorageAction {
+    CREATE = "CREATE",
+    UPDATE = "UPDATE",
+    DELETE = "DELETE",
+};

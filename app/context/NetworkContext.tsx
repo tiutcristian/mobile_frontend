@@ -1,9 +1,6 @@
 "use client";
-
 import { createContext, useReducer, useContext, ReactNode } from "react";
 import { NetworkActionType, Listing, NetworkState, NetworkStateType } from "../types";
-
-// const importedListings = jsonListings as Listing[];
 
 export function networkReducer(state: NetworkStateType, action: NetworkActionType): NetworkStateType {
   switch (action.type) {
