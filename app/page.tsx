@@ -3,43 +3,61 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import SearchBar from '@/components/SearchBar';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { Listing, LocalStorageAction } from './types';
 import ListingCard from '@/components/ListingCard';
 import { addActionToQueue, deleteLocalListing, getLocalListings, setLocalListings } from './offlineSupport/CRUDLocalStorage';
 import { isServerUp } from './apiCalls/serverStatus';
+import { Spinner } from '@/components/Spinner';
+import { fetchListings, getNoOfPages } from './apiCalls/fetchListings';
+import { useInView } from 'react-intersection-observer';
+import { delay } from '@/lib/utils';
 
 
 export default function Home() {
 
 	const [listings, setListings] = useState<Listing[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [pagesLoaded, setPagesLoaded] = useState(0);
+	const [totalPages, setTotalPages] = useState(0);
+    const { ref, inView } = useInView();
+
+	const fetchMoreListings = async () => {
+        await delay(1000);
+        const nextPage = pagesLoaded + 1;
+        const newListings = await fetchListings(nextPage, 5);
+		console.log('Fetched page:', nextPage);
+        setListings((prevListings) => [...prevListings, ...(newListings || [])]);
+        setPagesLoaded(nextPage);
+    };
+
+    useEffect(() => {
+        if (inView) {
+            console.log("Loading more listings...");
+            fetchMoreListings();
+        }
+    }, [inView]);
+
+	useEffect(() => {
+		const fetchNoOfPages = async () => {
+			if (await isServerUp()) {
+				const noOfPages = await getNoOfPages(5);
+				if (noOfPages) {
+					setTotalPages(noOfPages);
+					console.log('Total pages:', noOfPages);
+				}
+			}
+		};
+		fetchNoOfPages();
+	}, []);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			if (await isServerUp()) {
-				const params = new URLSearchParams({
-					'page': '0',
-					'size': '10',
-				});
-				fetch(`http://localhost:8080/api/v1/listings?${params}`, {
-					method: 'GET',
-					headers: {
-						'x-api-key': 'mobile',
-					},
-				})
-					.then((response) => {
-						if (!response.ok) {
-							throw new Error('Failed to fetch data');
-						}
-						return response.json();
-					})
-					.then((data) => {
-						setListings(data.content)
-						setLocalListings(data.content);
-					})				
-					.then(() => setLoading(false))
-					.catch((error) => console.error('Error fetching data:', error));
+				const fetchedListings = await fetchListings(0, 5);
+				setListings(fetchedListings || []);
+				setLocalListings(fetchedListings || []);
+				setLoading(false);
 			} else {
 				const localListings = getLocalListings();
 				setListings(localListings);
@@ -142,15 +160,20 @@ export default function Home() {
 			)}
 
 			{listings.length > 0 && (
-				<div className="flex flex-col gap-8 w-full max-w-6xl">
-					{listings.map((listing) => (
-						<ListingCard
-							key={listing.id}
-							listing={listing}
-							handleDelete={handleDelete}
-						/>
-					))}
-				</div>
+				<>
+					<div className="flex flex-col gap-8 w-full max-w-6xl">
+						{listings.map((listing) => (
+							<ListingCard
+								key={listing.id}
+								listing={listing}
+								handleDelete={handleDelete}
+							/>
+						))}
+					</div>
+					<div ref={ref} className="flex flex-column justify-center items-center">
+						{totalPages-1 > pagesLoaded && <Spinner />}
+					</div>
+				</>
 			)}
 		</main>
 	);
