@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import SearchBar from '@/components/SearchBar';
 import Link from 'next/link';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Listing, LocalStorageAction } from './types';
 import ListingCard from '@/components/ListingCard';
 import { addActionToQueue, deleteLocalListing, getLocalListings, setLocalListings } from './offlineSupport/CRUDLocalStorage';
@@ -11,7 +11,7 @@ import { isServerUp } from './apiCalls/serverStatus';
 import { Spinner } from '@/components/Spinner';
 import { fetchListings, getNoOfPages } from './apiCalls/fetchListings';
 import { useInView } from 'react-intersection-observer';
-import { delay } from '@/lib/utils';
+import { delay, getBaseUrl } from '@/lib/utils';
 
 
 export default function Home() {
@@ -75,7 +75,7 @@ export default function Home() {
 			setListings((prevListings) => prevListings.filter((listing) => listing.id !== id));
 
 			if (await isServerUp()) {
-				await fetch(`http://localhost:8080/api/v1/listings/${id}`, {
+				await fetch(`${getBaseUrl()}/api/v1/listings/${id}`, {
 					method: 'DELETE',
 					headers: {
 						'x-api-key': 'mobile',
@@ -102,7 +102,7 @@ export default function Home() {
 				'size': '10',
 				'title': search,
 			});
-			await fetch(`http://localhost:8080/api/v1/listings/search?${params}`, {
+			await fetch(`${getBaseUrl()}/api/v1/listings/search?${params}`, {
 				method: 'GET',
 				headers: {
 					'x-api-key': 'mobile',

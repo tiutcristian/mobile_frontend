@@ -1,3 +1,4 @@
+import { getBaseUrl } from "@/lib/utils";
 import { Listing, LocalStorageAction } from "../types";
 
 export function getLocalListings() {
@@ -90,7 +91,7 @@ export function syncQueueChanges() {
 
 
 function createListingAPICall(listing: Listing) {
-    fetch(`http://localhost:8080/api/v1/listings/create`, {
+    fetch(`${getBaseUrl()}/api/v1/listings/create`, {
         method: 'POST',
         headers: {
             'x-api-key': 'mobile',
@@ -140,7 +141,7 @@ function createListingAPICall(listing: Listing) {
 
 
 async function updateListingAPICall(listingId: number, updatedListing: Listing) {
-    await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+    await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
         method: 'PUT',
         headers: {
             'x-api-key': 'mobile',
@@ -171,7 +172,7 @@ async function updateListingAPICall(listingId: number, updatedListing: Listing) 
 
 
 function deleteListingAPICall(id: number) {
-    fetch(`http://localhost:8080/api/v1/listings/${id}`, {
+    fetch(`${getBaseUrl()}/api/v1/listings/${id}`, {
         method: 'DELETE',
         headers: {
             'x-api-key': 'mobile',

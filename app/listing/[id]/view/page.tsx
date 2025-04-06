@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Listing } from "@/app/types";
 import { isServerUp } from "@/app/apiCalls/serverStatus";
 import { getLocalListing } from "@/app/offlineSupport/CRUDLocalStorage";
+import { getBaseUrl } from "@/lib/utils";
 
 export default function Page() {
     let params = useParams();
@@ -20,7 +21,7 @@ export default function Page() {
         const fetchListing = async () => {
             if (await isServerUp()) {
                 try {
-                    const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+                    const response = await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
                         method: 'GET',
                         headers: {
                             'x-api-key': 'mobile',

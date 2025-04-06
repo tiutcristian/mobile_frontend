@@ -5,6 +5,7 @@ import { FuelType, Listing, LocalStorageAction, Transmission } from "../../../ty
 import { useParams } from "next/navigation";
 import { addActionToQueue, getLocalListing, updateLocalListing } from "@/app/offlineSupport/CRUDLocalStorage";
 import { isServerUp } from "@/app/apiCalls/serverStatus";
+import { getBaseUrl } from "@/lib/utils";
 
 export default function Form() {
 
@@ -31,7 +32,7 @@ export default function Form() {
 	useEffect(() => {
 		const fetchListing = async () => {
 			if (await isServerUp()) {
-				const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+				const response = await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
 					method: 'GET',
 					headers: {
 						'x-api-key': 'mobile',
@@ -210,7 +211,7 @@ export default function Form() {
 
 		if (await isServerUp()) {
 
-			await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+			await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
 				method: 'PUT',
 				headers: {
 					'x-api-key': 'mobile',

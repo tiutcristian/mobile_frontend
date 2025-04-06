@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FuelType, Listing, LocalStorageAction, Transmission } from "../types";
 import { isServerUp } from "../apiCalls/serverStatus";
 import { addActionToQueue, addLocalListing, getLocalListings } from "../offlineSupport/CRUDLocalStorage";
+import { getBaseUrl } from "@/lib/utils";
 
 export default function Form() {
 	// form state
@@ -44,7 +45,7 @@ export default function Form() {
 		addLocalListing(newListing);
 		
 		if (await isServerUp()) {
-			fetch(`http://localhost:8080/api/v1/listings/create`, {
+			fetch(`${getBaseUrl()}/api/v1/listings/create`, {
 				method: 'POST',
 				headers: {
 					'x-api-key': 'mobile',

@@ -1,3 +1,4 @@
+import { getBaseUrl } from "@/lib/utils";
 import { Listing } from "../types";
 
 export async function fetchListings(page: number, size: number) {
@@ -5,7 +6,7 @@ export async function fetchListings(page: number, size: number) {
         'page': page.toString(),
         'size': size.toString(),
     });
-    const apiURL = `http://localhost:8080/api/v1/listings?${params}`;
+    const apiURL = `${getBaseUrl()}/api/v1/listings?${params}`;
     try {
         const response = await fetch(apiURL, {
             method: 'GET',
@@ -29,7 +30,7 @@ export async function getNoOfPages(size: number) {
         'page': '0',
         'size': size.toString(),
     });
-    const apiURL = `http://localhost:8080/api/v1/listings?${params}`;
+    const apiURL = `${getBaseUrl()}/api/v1/listings?${params}`;
     try {
         const response = await fetch(apiURL, {
             method: 'GET',
