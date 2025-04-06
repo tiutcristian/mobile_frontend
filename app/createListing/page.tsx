@@ -1,6 +1,8 @@
 'use client';
 import { useState } from "react";
-import { FuelType, Listing, Transmission } from "../types";
+import { FuelType, Listing, LocalStorageAction, Transmission } from "../types";
+import { isServerUp } from "../apiCalls/serverStatus";
+import { addActionToQueue, addLocalListing, getLocalListings } from "../offlineSupport/CRUDLocalStorage";
 
 export default function Form() {
 	// form state
@@ -18,18 +20,69 @@ export default function Form() {
 	const [fuelType, setFuelType] = useState<FuelType>(FuelType.PETROL);
 
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		var imagePlaceholder = "https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg";
 
-		fetch(`http://localhost:8080/api/v1/listings/create`, {
-			method: 'POST',
-			headers: {
-				'x-api-key': 'mobile',
-				'Content-Type': 'application/json',
-			},
-			body: `
+		// update local storage
+		const newListing: Listing = {
+			id: Date.now(),
+			imageUrl: imagePlaceholder,
+			title: title,
+			price: price,
+			make: make,
+			model: model,
+			description: description,
+			year: year,
+			mileage: mileage,
+			engineSize: engineSize,
+			horsepower: horsepower,
+			transmission: transmission,
+			fuelType: fuelType,
+		};
+		addLocalListing(newListing);
+		
+		if (await isServerUp()) {
+			fetch(`http://localhost:8080/api/v1/listings/create`, {
+				method: 'POST',
+				headers: {
+					'x-api-key': 'mobile',
+					'Content-Type': 'application/json',
+				},
+				body: `
+					{
+						"userId": 1,
+						"imageUrl": "${imagePlaceholder}",
+						"title": "${title}",
+						"price": ${price},
+						"make": "${make}",
+						"model": "${model}",
+						"description": "${description}",
+						"year": ${year},
+						"mileage": ${mileage},
+						"engineSize": ${engineSize},
+						"horsepower": ${horsepower},
+						"transmission": "${transmission}",
+						"fuelType": "${fuelType}"
+					}
+				`,
+			})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Failed to create listing');
+				}
+				return response.json();
+			})
+			.then((data) => {
+				window.location.href = `/listing/${data.id}/view`;
+			})
+			.catch((error) => {
+				console.error('Error creating listing:', error);
+				alert('Failed to create listing. Please try again.');
+			});
+		} else {
+			addActionToQueue(LocalStorageAction.CREATE, `
 				{
 					"userId": 1,
 					"imageUrl": "${imagePlaceholder}",
@@ -44,23 +97,10 @@ export default function Form() {
 					"horsepower": ${horsepower},
 					"transmission": "${transmission}",
 					"fuelType": "${fuelType}"
-				}
-			`,
-		})
-		.then((response) => {
-			if (!response.ok) {
-				throw new Error('Failed to create listing');
-			}
-			return response.json();
-		})
-		.then((data) => {
-			console.log('Listing created:', data);
-			window.location.href = `/listing/${data.id}/view`;
-		})
-		.catch((error) => {
-			console.error('Error creating listing:', error);
-			alert('Failed to create listing. Please try again.');
-		});
+				}	
+			`);
+			window.location.href = `/listing/${newListing.id}/view`;
+		}
 	}
 
 

@@ -6,35 +6,40 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Listing } from "@/app/types";
+import { isServerUp } from "@/app/apiCalls/serverStatus";
+import { getLocalListing } from "@/app/offlineSupport/CRUDLocalStorage";
 
 export default function Page() {
-    
-
     let params = useParams();
     const listingId = parseInt(params.id as string);
     const [listing, setListing] = useState<Listing | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-    const fetchListing = async () => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
-                method: 'GET',
-                headers: {
-                    'x-api-key': 'mobile',
-                },
-            });
-            if (!response.ok) {
-                throw new Error('Failed to fetch listing');
-            }
-            const data = await response.json();
-            setListing(data);
-            setLoading(false);
-        } catch (error) {
-            setError(error instanceof Error ? error : new Error(String(error)));
-            setLoading(false);
-        }
-    };
+    
     useEffect(() => {
+        const fetchListing = async () => {
+            if (await isServerUp()) {
+                try {
+                    const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+                        method: 'GET',
+                        headers: {
+                            'x-api-key': 'mobile',
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch listing');
+                    }
+                    const data = await response.json();
+                    setListing(data);
+                } catch (error) {
+                    setError(error instanceof Error ? error : new Error(String(error)));
+                }
+            } else {
+                const l = getLocalListing(listingId);
+                setListing(l);
+            }
+            setLoading(false);
+        };
         fetchListing();
     }
     , [listingId]);

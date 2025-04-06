@@ -4,8 +4,10 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import SearchBar from '@/components/SearchBar';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Listing } from './types';
+import { Listing, LocalStorageAction } from './types';
 import ListingCard from '@/components/ListingCard';
+import { addActionToQueue, deleteLocalListing, getLocalListings, setLocalListings } from './offlineSupport/CRUDLocalStorage';
+import { isServerUp } from './apiCalls/serverStatus';
 
 
 export default function Home() {
@@ -14,74 +16,98 @@ export default function Home() {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const params = new URLSearchParams({
-			'page': '0',
-			'size': '10',
-		});
-		fetch(`http://localhost:8080/api/v1/listings?${params}`, {
-			method: 'GET',
-			headers: {
-				'x-api-key': 'mobile',
-			},
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('Failed to fetch data');
-				}
-				return response.json();
-			})
-			.then((data) => setListings(data.content))
-			.then(() => setLoading(false))
-			.catch((error) => console.error('Error fetching data:', error));
+		const fetchData = async () => {
+			if (await isServerUp()) {
+				const params = new URLSearchParams({
+					'page': '0',
+					'size': '10',
+				});
+				fetch(`http://localhost:8080/api/v1/listings?${params}`, {
+					method: 'GET',
+					headers: {
+						'x-api-key': 'mobile',
+					},
+				})
+					.then((response) => {
+						if (!response.ok) {
+							throw new Error('Failed to fetch data');
+						}
+						return response.json();
+					})
+					.then((data) => {
+						setListings(data.content)
+						setLocalListings(data.content);
+					})				
+					.then(() => setLoading(false))
+					.catch((error) => console.error('Error fetching data:', error));
+			} else {
+				const localListings = getLocalListings();
+				setListings(localListings);
+				setLoading(false);
+			}
+		};
+
+		fetchData();
 	}, []);
 
-	const handleDelete = (id: number) => {
+	const handleDelete = async (id: number) => {
 		if (confirm('Are you sure you want to delete this listing?')) {
-			fetch(`http://localhost:8080/api/v1/listings/${id}`, {
-				method: 'DELETE',
+			
+			deleteLocalListing(id);
+			setListings((prevListings) => prevListings.filter((listing) => listing.id !== id));
+
+			if (await isServerUp()) {
+				await fetch(`http://localhost:8080/api/v1/listings/${id}`, {
+					method: 'DELETE',
+					headers: {
+						'x-api-key': 'mobile',
+					},
+				})
+					.then(async (response) => {
+						if (!response.ok) {
+							throw new Error('Failed to delete listing');
+						}
+					})
+					.catch((error) => alert('Error deleting listing: ' + error));
+			} else {
+				addActionToQueue(LocalStorageAction.DELETE, id);
+			}
+		}
+	};
+
+	const handleSearch = async (search: string) => {
+		setLoading(true);
+
+		if (await isServerUp()) {
+			const params = new URLSearchParams({
+				'page': '0',
+				'size': '10',
+				'title': search,
+			});
+			await fetch(`http://localhost:8080/api/v1/listings/search?${params}`, {
+				method: 'GET',
 				headers: {
 					'x-api-key': 'mobile',
 				},
 			})
 				.then((response) => {
 					if (!response.ok) {
-						throw new Error('Failed to delete listing');
+						throw new Error('Failed to fetch data');
 					}
-					setListings((prevListings) =>
-						prevListings.filter((listing) => listing.id !== id)
-					);
-				})
-				.catch((error) => {
-					alert('Error deleting listing: ' + error);
-				});
-		}
-	};
-
-	const handleSearch = (search: string) => {
-		const params = new URLSearchParams({
-			'page': '0',
-			'size': '10',
-			'title': search,
-		});
-		
-		setLoading(true);
-
-		fetch(`http://localhost:8080/api/v1/listings/search?${params}`, {
-			method: 'GET',
-			headers: {
-				'x-api-key': 'mobile',
-			},
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('Failed to fetch data');
+					return response.json();
 				}
-				return response.json();
-			}
-			)
-			.then((data) => setListings(data.content))
-			.then(() => setLoading(false))
-			.catch((error) => console.error('Error fetching data:', error));
+				)
+				.then((data) => setListings(data.content))
+				.catch((error) => console.error('Error fetching data:', error));
+		} else {
+			const localListings = getLocalListings();
+			const filteredListings = localListings.filter((listing: Listing) =>
+				listing.title.toLowerCase().includes(search.toLowerCase())
+			);
+			setListings(filteredListings);
+		}
+
+		setLoading(false);
 	}
 		
 	if (loading) {
@@ -115,15 +141,17 @@ export default function Home() {
 				</h1>
 			)}
 
-			<div className="flex flex-col gap-8 w-full max-w-6xl">
-				{listings.map((listing) => (
-					<ListingCard
-						key={listing.id}
-						listing={listing}
-						handleDelete={handleDelete}
-					/>
-				))}
-			</div>
+			{listings.length > 0 && (
+				<div className="flex flex-col gap-8 w-full max-w-6xl">
+					{listings.map((listing) => (
+						<ListingCard
+							key={listing.id}
+							listing={listing}
+							handleDelete={handleDelete}
+						/>
+					))}
+				</div>
+			)}
 		</main>
 	);
 }

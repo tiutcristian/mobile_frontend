@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FuelType, Listing, Transmission } from "../../../types";
+import { FuelType, Listing, LocalStorageAction, Transmission } from "../../../types";
 import { useParams } from "next/navigation";
+import { addActionToQueue, getLocalListing, updateLocalListing } from "@/app/offlineSupport/CRUDLocalStorage";
+import { isServerUp } from "@/app/apiCalls/serverStatus";
 
 export default function Form() {
 
@@ -28,37 +30,58 @@ export default function Form() {
 
 	useEffect(() => {
 		const fetchListing = async () => {
-			const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
-				method: 'GET',
-				headers: {
-					'x-api-key': 'mobile',
-				},
-			})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('Listing not found');
+			if (await isServerUp()) {
+				const response = await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+					method: 'GET',
+					headers: {
+						'x-api-key': 'mobile',
+					},
+				})
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error('Listing not found');
+					}
+					return response.json();
+				})
+				.then((data) => {
+					setListing(data);
+					setImage(data.imageUrl);
+					setTitle(data.title);
+					setPrice(data.price);
+					setMake(data.make);
+					setModel(data.model);
+					setDescription(data.description);
+					setYear(data.year);
+					setMileage(data.mileage);
+					setEngineSize(data.engineSize);
+					setHorsepower(data.horsepower);
+					setTransmission(data.transmission);
+					setFuelType(data.fuelType);
+				})
+				.catch((error) => {
+					console.error('Error fetching listing:', error);
+					setListing(null);
+				});
+			} else {
+				const l = getLocalListing(listingId);
+				if (l) {
+					setListing(l);
+					setImage(l.imageUrl);
+					setTitle(l.title);
+					setPrice(l.price);
+					setMake(l.make);
+					setModel(l.model);
+					setDescription(l.description);
+					setYear(l.year);
+					setMileage(l.mileage);
+					setEngineSize(l.engineSize);
+					setHorsepower(l.horsepower);
+					setTransmission(l.transmission);
+					setFuelType(l.fuelType);
+				} else {
+					setListing(null);
 				}
-				return response.json();
-			})
-			.then((data) => {
-				setListing(data);
-				setImage(data.imageUrl);
-				setTitle(data.title);
-				setPrice(data.price);
-				setMake(data.make);
-				setModel(data.model);
-				setDescription(data.description);
-				setYear(data.year);
-				setMileage(data.mileage);
-				setEngineSize(data.engineSize);
-				setHorsepower(data.horsepower);
-				setTransmission(data.transmission);
-				setFuelType(data.fuelType);
-			})
-			.catch((error) => {
-				console.error('Error fetching listing:', error);
-				setListing(null);
-			});
+			}
 		};
 		fetchListing();
 	}
@@ -158,39 +181,65 @@ export default function Form() {
 	}
 
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		var imagePlaceholder = "/images/placeholder.png";
 
-		fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
-			method: 'PUT',
-			headers: {
-				'x-api-key': 'mobile',
-				'Content-Type': 'application/json',
-			},
-			body: `
-				{
-					"id": ${listingId},
-					"userId": 1,
-					"imageUrl": "${image ? image : imagePlaceholder}",
-					"title": "${title}",
-					"price": ${price},
-					"make": "${make}",
-					"model": "${model}",
-					"description": "${description}",
-					"year": ${year},
-					"mileage": ${mileage},
-					"engineSize": ${engineSize},
-					"horsepower": ${horsepower},
-					"transmission": "${transmission}",
-					"fuelType": "${fuelType}"
-				}
-			`,
-		});
+		if (image) {
+			imagePlaceholder = image;
+		}
 
+		// update local storage
+		const newListing: Listing = {
+			id: listingId,
+			imageUrl: imagePlaceholder,
+			title: title,
+			price: price,
+			make: make,
+			model: model,
+			description: description,
+			year: year,
+			mileage: mileage,
+			engineSize: engineSize,
+			horsepower: horsepower,
+			transmission: transmission,
+			fuelType: fuelType,
+		};
+		updateLocalListing(listingId, newListing);
 
-		window.history.back();
+		if (await isServerUp()) {
+
+			await fetch(`http://localhost:8080/api/v1/listings/${listingId}`, {
+				method: 'PUT',
+				headers: {
+					'x-api-key': 'mobile',
+					'Content-Type': 'application/json',
+				},
+				body: `
+					{
+						"id": ${listingId},
+						"userId": 1,
+						"imageUrl": "${imagePlaceholder}",
+						"title": "${title}",
+						"price": ${price},
+						"make": "${make}",
+						"model": "${model}",
+						"description": "${description}",
+						"year": ${year},
+						"mileage": ${mileage},
+						"engineSize": ${engineSize},
+						"horsepower": ${horsepower},
+						"transmission": "${transmission}",
+						"fuelType": "${fuelType}"
+					}
+				`,
+			});
+		} else {
+			addActionToQueue(LocalStorageAction.UPDATE, newListing);
+		}
+
+		window.location.href = "/";
 	}
 
 	return (
