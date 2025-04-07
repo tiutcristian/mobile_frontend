@@ -1,5 +1,7 @@
+import { getBaseUrl } from "@/lib/utils";
+
 export function isServerUp() {
-    return fetch(`http://localhost:8080/api/v1/heartbeat`, {
+    return fetch(`${getBaseUrl()}/api/v1/heartbeat`, {
         method: 'GET',
         headers: {
             'x-api-key': 'mobile',
