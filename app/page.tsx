@@ -23,7 +23,6 @@ export default function Home() {
     const { ref, inView } = useInView();
 
 	const fetchMoreListings = async () => {
-        await delay(1000);
         const nextPage = pagesLoaded + 1;
         const newListings = await fetchListings(nextPage, 5);
 		console.log('Fetched page:', nextPage);
