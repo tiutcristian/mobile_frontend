@@ -83,23 +83,8 @@ export default function Form() {
 				alert('Failed to create listing. Please try again.');
 			});
 		} else {
-			addActionToQueue(LocalStorageAction.CREATE, `
-				{
-					"userId": 1,
-					"imageUrl": "${imagePlaceholder}",
-					"title": "${title}",
-					"price": ${price},
-					"make": "${make}",
-					"model": "${model}",
-					"description": "${description}",
-					"year": ${year},
-					"mileage": ${mileage},
-					"engineSize": ${engineSize},
-					"horsepower": ${horsepower},
-					"transmission": "${transmission}",
-					"fuelType": "${fuelType}"
-				}	
-			`);
+			addActionToQueue(LocalStorageAction.CREATE, newListing);
+
 			window.location.href = `/listing/${newListing.id}/view`;
 		}
 	}
