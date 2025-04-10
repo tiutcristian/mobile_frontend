@@ -57,7 +57,7 @@ export default function Page() {
         <main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center justify-center gap-8">
             {/* go back to dashboard */}
             <Link 
-                className="fixed top-8 left-8 text-white hover:text-gray-300 flex items-center justify-center cursor-pointer gap-2"
+                className="fixed top-20 left-8 text-white hover:text-gray-300 flex items-center justify-center cursor-pointer gap-2"
                 href="/"
             >
                 <FontAwesomeIcon icon={faChevronLeft} />

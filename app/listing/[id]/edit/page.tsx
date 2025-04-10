@@ -333,6 +333,7 @@ export default function Form() {
 						id="fuelType"
 						value={fuelType}
 						onChange={e => setFuelType(e.target.value as FuelType)}
+						className="p-2 border border-gray-300 rounded"
 					>
 						<option value={FuelType.PETROL}>PETROL</option>
 						<option value={FuelType.DIESEL}>DIESEL</option>
@@ -346,6 +347,7 @@ export default function Form() {
 						id="transmission"
 						value={transmission}
 						onChange={e => setTransmission(e.target.value as Transmission)}
+						className="p-2 border border-gray-300 rounded"
 					>
 						<option value={Transmission.MANUAL}>MANUAL</option>
 						<option value={Transmission.AUTOMATIC}>AUTOMATIC</option>
