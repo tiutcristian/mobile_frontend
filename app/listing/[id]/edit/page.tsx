@@ -1,15 +1,94 @@
 "use client";
 
-import { useState } from "react";
-import { FuelType, Listing, Transmission } from "../../../types";
-import { useListings } from "../../../context/ListingsContext";
+import { useEffect, useState } from "react";
+import { FuelType, Listing, LocalStorageAction, Transmission } from "../../../types";
 import { useParams } from "next/navigation";
+import { addActionToQueue, getLocalListing, updateLocalListing } from "@/app/offlineSupport/CRUDLocalStorage";
+import { isServerUp } from "@/app/apiCalls/serverStatus";
+import { getBaseUrl } from "@/lib/utils";
 
 export default function Form() {
-	const { state, dispatch } = useListings();
 
 	let params = useParams();
-	const listing = state.listings.find((l) => l.id === parseInt(params.id as string));
+	const listingId = parseInt(params.id as string)
+
+	// TODO: Fetch the listing from the API
+	const [listing, setListing] = useState<Listing | null>(null);
+
+	const [image, setImage] = useState<string>(listing ? listing.imageUrl : "/images/placeholder.png");
+	const [title, setTitle] = useState<string>(listing ? listing.title : "");
+	const [price, setPrice] = useState<number>(listing ? listing.price : 0);
+	const [make, setMake] = useState<string>(listing ? listing.make : "");
+	const [model, setModel] = useState<string>(listing ? listing.model : "");
+	const [description, setDescription] = useState<string>(listing ? listing.description : "");
+	const [year, setYear] = useState<number>(listing ? listing.year : 0);
+	const [mileage, setMileage] = useState<number>(listing ? listing.mileage : 0);
+	const [engineSize, setEngineSize] = useState<number>(listing ? listing.engineSize : 0);
+	const [horsepower, setHorsepower] = useState<number>(listing ? listing.horsepower : 0);
+	const [transmission, setTransmission] = useState<Transmission>(listing ? listing.transmission : Transmission.MANUAL);
+	const [fuelType, setFuelType] = useState<FuelType>(listing ? listing.fuelType : FuelType.PETROL);
+	
+
+	useEffect(() => {
+		const fetchListing = async () => {
+			if (await isServerUp()) {
+				const response = await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
+					method: 'GET',
+					headers: {
+						'x-api-key': 'mobile',
+					},
+				})
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error('Listing not found');
+					}
+					return response.json();
+				})
+				.then((data) => {
+					setListing(data);
+					setImage(data.imageUrl);
+					setTitle(data.title);
+					setPrice(data.price);
+					setMake(data.make);
+					setModel(data.model);
+					setDescription(data.description);
+					setYear(data.year);
+					setMileage(data.mileage);
+					setEngineSize(data.engineSize);
+					setHorsepower(data.horsepower);
+					setTransmission(data.transmission);
+					setFuelType(data.fuelType);
+				})
+				.catch((error) => {
+					console.error('Error fetching listing:', error);
+					setListing(null);
+				});
+			} else {
+				const l = getLocalListing(listingId);
+				if (l) {
+					setListing(l);
+					setImage(l.imageUrl);
+					setTitle(l.title);
+					setPrice(l.price);
+					setMake(l.make);
+					setModel(l.model);
+					setDescription(l.description);
+					setYear(l.year);
+					setMileage(l.mileage);
+					setEngineSize(l.engineSize);
+					setHorsepower(l.horsepower);
+					setTransmission(l.transmission);
+					setFuelType(l.fuelType);
+				} else {
+					setListing(null);
+				}
+			}
+		};
+		fetchListing();
+	}
+	, [listingId]);
+
+	
 	if (!listing) {
 		return (
 			<main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
@@ -17,19 +96,6 @@ export default function Form() {
 			</main>
 		);
 	}
-
-	const [image, setImage] = useState<string>(listing.image);
-	const [title, setTitle] = useState<string>(listing.title);
-	const [price, setPrice] = useState<number>(listing.price);
-	const [make, setMake] = useState<string>(listing.make);
-	const [model, setModel] = useState<string>(listing.model);
-	const [description, setDescription] = useState<string>(listing.description);
-	const [year, setYear] = useState<number>(listing.year);
-	const [mileage, setMileage] = useState<number>(listing.mileage);
-	const [engineSize, setEngineSize] = useState<number>(listing.engineSize);
-	const [horsepower, setHorsepower] = useState<number>(listing.horsepower);
-	const [transmission, setTransmission] = useState<Transmission>(listing.transmission);
-	const [fuelType, setFuelType] = useState<FuelType>(listing.fuelType);
 
 
 	const formValidation = {
@@ -116,14 +182,19 @@ export default function Form() {
 	}
 
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		var imagePlaceholder = "/images/placeholder.png";
 
-		const updatedListing: Listing = {
-			id: listing.id,
-			image: image || imagePlaceholder,
+		if (image) {
+			imagePlaceholder = image;
+		}
+
+		// update local storage
+		const newListing: Listing = {
+			id: listingId,
+			imageUrl: imagePlaceholder,
 			title: title,
 			price: price,
 			make: make,
@@ -136,11 +207,40 @@ export default function Form() {
 			transmission: transmission,
 			fuelType: fuelType,
 		};
+		updateLocalListing(listingId, newListing);
 
-		if (validateListing(updatedListing)) {
-			dispatch({ type: "UPDATE", payload: updatedListing });
-			window.history.back();
+		if (await isServerUp()) {
+
+			await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
+				method: 'PUT',
+				headers: {
+					'x-api-key': 'mobile',
+					'Content-Type': 'application/json',
+				},
+				body: `
+					{
+						"id": ${listingId},
+						"userId": 1,
+						"imageUrl": "${imagePlaceholder}",
+						"title": "${title}",
+						"price": ${price},
+						"make": "${make}",
+						"model": "${model}",
+						"description": "${description}",
+						"year": ${year},
+						"mileage": ${mileage},
+						"engineSize": ${engineSize},
+						"horsepower": ${horsepower},
+						"transmission": "${transmission}",
+						"fuelType": "${fuelType}"
+					}
+				`,
+			});
+		} else {
+			addActionToQueue(LocalStorageAction.UPDATE, newListing);
 		}
+
+		window.location.href = "/";
 	}
 
 	return (
@@ -233,11 +333,12 @@ export default function Form() {
 						id="fuelType"
 						value={fuelType}
 						onChange={e => setFuelType(e.target.value as FuelType)}
+						className="p-2 border border-gray-300 rounded"
 					>
-						<option value={FuelType.PETROL}>Petrol</option>
-						<option value={FuelType.DIESEL}>Diesel</option>
-						<option value={FuelType.ELECTRIC}>Electric</option>
-						<option value={FuelType.HYBRID}>Hybrid</option>
+						<option value={FuelType.PETROL}>PETROL</option>
+						<option value={FuelType.DIESEL}>DIESEL</option>
+						<option value={FuelType.ELECTRIC}>ELECTRIC</option>
+						<option value={FuelType.HYBRID}>HYBRID</option>
 					</select>
 				</div>
 				<div className="flex flex-col">
@@ -246,9 +347,10 @@ export default function Form() {
 						id="transmission"
 						value={transmission}
 						onChange={e => setTransmission(e.target.value as Transmission)}
+						className="p-2 border border-gray-300 rounded"
 					>
-						<option value={Transmission.MANUAL}>Manual</option>
-						<option value={Transmission.AUTOMATIC}>Automatic</option>
+						<option value={Transmission.MANUAL}>MANUAL</option>
+						<option value={Transmission.AUTOMATIC}>AUTOMATIC</option>
 					</select>
 				</div>
 				<div>

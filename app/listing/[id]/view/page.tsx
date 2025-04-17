@@ -3,15 +3,48 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useListings } from "@/app/context/ListingsContext";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Listing } from "@/app/types";
+import { isServerUp } from "@/app/apiCalls/serverStatus";
+import { getLocalListing } from "@/app/offlineSupport/CRUDLocalStorage";
+import { getBaseUrl } from "@/lib/utils";
 
 export default function Page() {
-    
-    const { state } = useListings();
-
     let params = useParams();
-    const listing = state.listings.find((l) => l.id === parseInt(params.id as string));
+    const listingId = parseInt(params.id as string);
+    const [listing, setListing] = useState<Listing | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+    
+    useEffect(() => {
+        const fetchListing = async () => {
+            if (await isServerUp()) {
+                try {
+                    const response = await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
+                        method: 'GET',
+                        headers: {
+                            'x-api-key': 'mobile',
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch listing');
+                    }
+                    const data = await response.json();
+                    setListing(data);
+                } catch (error) {
+                    setError(error instanceof Error ? error : new Error(String(error)));
+                }
+            } else {
+                const l = getLocalListing(listingId);
+                setListing(l);
+            }
+            setLoading(false);
+        };
+        fetchListing();
+    }
+    , [listingId]);
+
     if (!listing) {
         return (
             <main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
@@ -24,13 +57,13 @@ export default function Page() {
         <main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center justify-center gap-8">
             {/* go back to dashboard */}
             <Link 
-                className="fixed top-8 left-8 text-white hover:text-gray-300 flex items-center justify-center cursor-pointer gap-2"
+                className="fixed top-20 left-8 text-white hover:text-gray-300 flex items-center justify-center cursor-pointer gap-2"
                 href="/"
             >
                 <FontAwesomeIcon icon={faChevronLeft} />
                 Back to Dashboard
             </Link>
-            <img className="w-1/3 object-cover rounded-xl" src={listing.image} alt={listing.title} />
+            <img className="w-1/3 object-cover rounded-xl" src={listing.imageUrl} alt={listing.title} />
             <div className="flex align-center justify-between gap-4 w-full max-w-6xl p-8 rounded-xl dark:bg-gray-800">
                 <h1 className="text-4xl font-semibold text-gray-900 dark:text-white">{listing.title}</h1>
                 <p className="text-2xl text-gray-700 dark:text-gray-400 font-medium">${listing.price}</p>

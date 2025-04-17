@@ -1,21 +1,15 @@
-import { useListings } from "@/app/context/ListingsContext";
 import { Listing } from "@/app/types";
 import { faEye, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { useState } from "react";
 import CarAgeBadge from "./CarAgeBadge";
 
-interface ListingCardProps { listing : Listing; }
+interface ListingCardProps { 
+    listing : Listing; 
+    handleDelete : (id: number) => void;
+}
 
 export default function ListingCard(props : ListingCardProps) {
-    const { state, dispatch } = useListings();
-
-    const handleDelete = (id: number) => {
-        if (confirm("Are you sure you want to delete this listing?")) {
-            dispatch({ type: "DELETE", payload: id });
-        }
-    };
   
     return (
         <div
@@ -24,7 +18,7 @@ export default function ListingCard(props : ListingCardProps) {
             <CarAgeBadge listing={props.listing} />
             <img
                 className="object-cover sm:w-1/4 h-64 rounded-t-xl sm:rounded-none sm:rounded-s-xl"
-                src={props.listing.image}
+                src={props.listing.imageUrl}
                 alt={props.listing.title}
             />
             <div className="flex justify-between w-full sm:w-3/4 h-full">
@@ -48,7 +42,7 @@ export default function ListingCard(props : ListingCardProps) {
                     </Link>
                     <button 
                         className="bg-blue-900 text-white p-4 rounded-full hover:bg-blue-800 cursor-pointer flex justify-center"
-                        onClick={() => handleDelete(props.listing.id)}
+                        onClick={() => props.handleDelete(props.listing.id)}
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </button>

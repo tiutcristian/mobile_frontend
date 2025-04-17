@@ -1,35 +1,50 @@
 export enum Transmission {
-    MANUAL = "Manual",
-    AUTOMATIC = "Automatic",
+    MANUAL = "MANUAL",
+    AUTOMATIC = "AUTOMATIC",
 }
 
 export enum FuelType {
-    PETROL = "Petrol",
-    DIESEL = "Diesel",
-    ELECTRIC = "Electric",
-    HYBRID = "Hybrid",
+    PETROL = "PETROL",
+    DIESEL = "DIESEL",
+    ELECTRIC = "ELECTRIC",
+    HYBRID = "HYBRID",
 }
 
 export type Listing = {
-    id : number;
-    image : string;
-	title : string;
-    price : number;
-    make : string;
-    model : string;
-	description : string;
-    year : number;
-    mileage : number;
-    engineSize : number;
-    horsepower : number;
-    transmission : Transmission;
-    fuelType : FuelType;
+    id: number;
+    imageUrl: string;
+    title: string;
+    price: number;
+    make: string;
+    model: string;
+    description: string;
+    year: number;
+    mileage: number;
+    engineSize: number;
+    horsepower: number;
+    transmission: Transmission;
+    fuelType: FuelType;
 };
 
-export type ListingsStateType = { listings: Listing[]; };
+export enum NetworkState {
+    NETWORK_DOWN = "NETWORK_DOWN",
+    SERVER_DOWN = "SERVER_DOWN",
+    UP = "UP",
+}
 
-export type ActionType =
-  | { type: "CREATE"; payload: Listing }
-  | { type: "UPDATE"; payload: Listing }
-  | { type: "DELETE"; payload: number }
-  | { type: "FILTER"; payload: string };
+export type NetworkStateType = {
+    networkState: NetworkState,
+};
+
+export type NetworkActionType = { 
+    type: "UPDATE",
+    payload: { 
+        networkState: NetworkState,
+    } 
+}
+
+export enum LocalStorageAction {
+    CREATE = "CREATE",
+    UPDATE = "UPDATE",
+    DELETE = "DELETE",
+};

@@ -1,7 +1,9 @@
 'use client';
 import { useState } from "react";
-import { FuelType, Listing, Transmission } from "../types";
-import { useListings } from "../context/ListingsContext";
+import { FuelType, Listing, LocalStorageAction, Transmission } from "../types";
+import { isServerUp } from "../apiCalls/serverStatus";
+import { addActionToQueue, addLocalListing, getLocalListings } from "../offlineSupport/CRUDLocalStorage";
+import { getBaseUrl } from "@/lib/utils";
 
 export default function Form() {
 	// form state
@@ -18,100 +20,16 @@ export default function Form() {
 	const [transmission, setTransmission] = useState<Transmission>(Transmission.MANUAL);
 	const [fuelType, setFuelType] = useState<FuelType>(FuelType.PETROL);
 
-	const { state, dispatch } = useListings();
 
-
-	const formValidation = {
-		title: {
-			required: true,
-			minLength: 5,
-			maxLength: 100,
-		},
-		price: {
-			required: true,
-			min: 0,
-			max: 1000000,
-		},
-		make: {
-			required: true,
-			minLength: 2,
-			maxLength: 50,
-		},
-		model: {
-			required: true,
-			minLength: 2,
-			maxLength: 50,
-		},
-		description: {
-			minLength: 0,
-			maxLength: 1000,
-		},
-		year: {
-			required: true,
-			min: 1800,
-			max: new Date().getFullYear(),
-		},
-		mileage: {
-			required: true,
-			min: 0,
-			max: 10000000,
-		},
-		engineSize: {
-			required: true,
-			min: 0,
-			max: 10000,
-		},
-		horsepower: {
-			required: true,
-			min: 0,
-			max: 10000,
-		},
-	};
-
-	const validateListing = (listing: Listing) => {
-		const errors: string[] = [];
-
-		for (const key in formValidation) {
-			const rules = formValidation[key as keyof typeof formValidation];
-			const value = listing[key as keyof Listing];
-
-			if ('required' in rules && rules.required && !value) {
-				errors.push(`${key} is required`);
-			}
-
-			if ('minLength' in rules && typeof value === 'string' && value.length < rules.minLength) {
-				errors.push(`${key} must be at least ${rules.minLength} characters long`);
-			}
-
-			if ('maxLength' in rules && typeof value === 'string' && value.length > rules.maxLength) {
-				errors.push(`${key} must be at most ${rules.maxLength} characters long`);
-			}
-
-			if ('min' in rules && typeof value === 'number' && value < rules.min) {
-				errors.push(`${key} must be at least ${rules.min}`);
-			}
-
-			if ('max' in rules && typeof value === 'number' && value > rules.max) {
-				errors.push(`${key} must be at most ${rules.max}`);
-			}
-		}
-
-		if (errors.length) {
-			alert(errors.join('\n'));
-			return false;
-		}
-		
-		return true;
-	}
-
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		var imagePlaceholder = "/images/placeholder.png";
-		
+		var imagePlaceholder = "https://www.shutterstock.com/image-vector/car-logo-icon-emblem-design-600nw-473088025.jpg";
+
+		// update local storage
 		const newListing: Listing = {
 			id: Date.now(),
-			image: image || imagePlaceholder,
+			imageUrl: imagePlaceholder,
 			title: title,
 			price: price,
 			make: make,
@@ -124,13 +42,54 @@ export default function Form() {
 			transmission: transmission,
 			fuelType: fuelType,
 		};
+		addLocalListing(newListing);
 		
-		if ( validateListing(newListing) ) {
-			dispatch({ type: "CREATE", payload: newListing });
-			window.history.back();
+		if (await isServerUp()) {
+			fetch(`${getBaseUrl()}/api/v1/listings/create`, {
+				method: 'POST',
+				headers: {
+					'x-api-key': 'mobile',
+					'Content-Type': 'application/json',
+				},
+				body: `
+					{
+						"userId": 1,
+						"imageUrl": "${imagePlaceholder}",
+						"title": "${title}",
+						"price": ${price},
+						"make": "${make}",
+						"model": "${model}",
+						"description": "${description}",
+						"year": ${year},
+						"mileage": ${mileage},
+						"engineSize": ${engineSize},
+						"horsepower": ${horsepower},
+						"transmission": "${transmission}",
+						"fuelType": "${fuelType}"
+					}
+				`,
+			})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Failed to create listing');
+				}
+				return response.json();
+			})
+			.then((data) => {
+				window.location.href = `/listing/${data.id}/view`;
+			})
+			.catch((error) => {
+				console.error('Error creating listing:', error);
+				alert('Failed to create listing. Please try again.');
+			});
+		} else {
+			addActionToQueue(LocalStorageAction.CREATE, newListing);
+
+			window.location.href = `/listing/${newListing.id}/view`;
 		}
 	}
-	
+
+
 	return (
 		<main className="w-full max-w-4xl mx-auto p-4 flex flex-col align-center">
 			<h1 className="text-2xl font-bold text-center">Create Listing</h1>
@@ -212,6 +171,7 @@ export default function Form() {
 						id="fuelType" 
 						value={fuelType} 
 						onChange={e => setFuelType(e.target.value as FuelType)}
+						className="p-2 border border-gray-300 rounded"
 					>
 						<option value={FuelType.PETROL}>Petrol</option>
 						<option value={FuelType.DIESEL}>Diesel</option>
@@ -225,6 +185,7 @@ export default function Form() {
 						id="transmission" 
 						value={transmission} 
 						onChange={e => setTransmission(e.target.value as Transmission)}
+						className="p-2 border border-gray-300 rounded"
 					>
 						<option value={Transmission.MANUAL}>Manual</option>
 						<option value={Transmission.AUTOMATIC}>Automatic</option>
