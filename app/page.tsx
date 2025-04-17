@@ -12,6 +12,7 @@ import { Spinner } from '@/components/Spinner';
 import { fetchListings, getNoOfPages } from './apiCalls/fetchListings';
 import { useInView } from 'react-intersection-observer';
 import { delay, getBaseUrl } from '@/lib/utils';
+import ButtonGroup from '@/components/ButtonGroup';
 
 
 export default function Home() {
@@ -143,6 +144,13 @@ export default function Home() {
 
 	return (
 		<main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
+			<ButtonGroup
+				children={["User1", "User2", "User3", "User4", "User5"]}
+				onClick={(index) => {
+					alert(`Button ${index + 1} clicked`);
+				}}
+			/>
+			
 			<SearchBar handleSearch={handleSearch}/>
 
 			<Link 
