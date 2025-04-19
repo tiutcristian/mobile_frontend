@@ -3,6 +3,6 @@ export function delay(ms: number) {
 }
 
 export function getBaseUrl() {
-    return "http://192.168.254.108:8080";
+    return "http://192.168.0.114:8080";
     // return "http://localhost:8080";
 }
