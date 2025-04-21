@@ -1,7 +1,6 @@
 'use client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import SearchBar from '@/components/SearchBar';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Listing, LocalStorageAction } from './types';
@@ -9,15 +8,18 @@ import ListingCard from '@/components/ListingCard';
 import { addActionToQueue, deleteLocalListing, getLocalListings, setLocalListings } from './offlineSupport/CRUDLocalStorage';
 import { isServerUp } from './apiCalls/serverStatus';
 import { Spinner } from '@/components/Spinner';
-import { fetchListings, getNoOfPages } from './apiCalls/fetchListings';
+import { fetchFilteredListings, fetchListings, getNoOfPages, getNoOfPagesFiltered } from './apiCalls/fetchListings';
+import { deleteListing } from './apiCalls/deleteListing';
 import { useInView } from 'react-intersection-observer';
-import { delay, getBaseUrl } from '@/lib/utils';
+import { delay } from '@/lib/utils';
 import ButtonGroup from '@/components/ButtonGroup';
+import SearchBar from '@/components/SearchBar';
 
 
 export default function Home() {
 
 	const [listings, setListings] = useState<Listing[]>([]);
+	const [search, setSearch] = useState<string>('');
 	const [loading, setLoading] = useState(true);
 	const [pagesLoaded, setPagesLoaded] = useState(0);
 	const [totalPages, setTotalPages] = useState(0);
@@ -26,14 +28,24 @@ export default function Home() {
 	const fetchMoreListings = async () => {
         await delay(1000);
         const nextPage = pagesLoaded + 1;
-        const newListings = await fetchListings(nextPage, 5);
+        var newListings: Listing[] | null = null;
+		if (search !== '') {
+			const params = new URLSearchParams({
+				'page': nextPage.toString(),
+				'size': '5',
+				'title': search,
+			});
+			newListings = await fetchFilteredListings(params);
+		} else {
+			newListings = await fetchListings(nextPage, 5);
+		}
 		console.log('Fetched page:', nextPage);
         setListings((prevListings) => [...prevListings, ...(newListings || [])]);
         setPagesLoaded(nextPage);
     };
 
     useEffect(() => {
-        if (inView) {
+        if (inView && pagesLoaded < totalPages - 1) {
             console.log("Loading more listings...");
             fetchMoreListings();
         }
@@ -76,18 +88,7 @@ export default function Home() {
 			setListings((prevListings) => prevListings.filter((listing) => listing.id !== id));
 
 			if (await isServerUp()) {
-				await fetch(`${getBaseUrl()}/api/v1/listings/${id}`, {
-					method: 'DELETE',
-					headers: {
-						'x-api-key': 'mobile',
-					},
-				})
-					.then(async (response) => {
-						if (!response.ok) {
-							throw new Error('Failed to delete listing');
-						}
-					})
-					.catch((error) => alert('Error deleting listing: ' + error));
+				await deleteListing(id);
 			} else {
 				addActionToQueue(LocalStorageAction.DELETE, id);
 			}
@@ -100,24 +101,16 @@ export default function Home() {
 		if (await isServerUp()) {
 			const params = new URLSearchParams({
 				'page': '0',
-				'size': '10',
+				'size': '5',
 				'title': search,
 			});
-			await fetch(`${getBaseUrl()}/api/v1/listings/search?${params}`, {
-				method: 'GET',
-				headers: {
-					'x-api-key': 'mobile',
-				},
-			})
-				.then((response) => {
-					if (!response.ok) {
-						throw new Error('Failed to fetch data');
-					}
-					return response.json();
-				}
-				)
-				.then((data) => setListings(data.content))
-				.catch((error) => console.error('Error fetching data:', error));
+			const fetchedListings = await fetchFilteredListings(params);
+			if (fetchedListings) {
+				setListings(fetchedListings);
+				setLocalListings(fetchedListings);
+			} else {
+				console.error('Error fetching filtered listings');
+			}
 		} else {
 			const localListings = getLocalListings();
 			const filteredListings = localListings.filter((listing: Listing) =>
@@ -125,6 +118,14 @@ export default function Home() {
 			);
 			setListings(filteredListings);
 		}
+
+		setPagesLoaded(0);
+		const noOfPages = await getNoOfPagesFiltered(new URLSearchParams({
+			'page': '0',
+			'size': '5',
+			'title': search,
+		}));
+		setTotalPages(noOfPages || 0);
 
 		setLoading(false);
 	}
@@ -151,11 +152,15 @@ export default function Home() {
 				}}
 			/>
 			
-			<SearchBar handleSearch={handleSearch}/>
+			<SearchBar 
+				search={search}
+				setSearch={setSearch}
+				handleSearch={handleSearch}
+			/>
 
 			<Link 
 				className="fixed bottom-8 right-8 bg-blue-700 hover:bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer"
-				href="/createListing"
+				href="/create-listing"
 			>
 				<FontAwesomeIcon icon={faPlus} className="text-2xl" />
 			</Link>

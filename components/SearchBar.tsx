@@ -2,8 +2,13 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
-export default function SearchBar({handleSearch}: {handleSearch: (search: string) => void}) {
-    const [search, setSearch] = useState("");
+interface SearchBarProps {
+    search: string;
+    setSearch: (search: string) => void;
+    handleSearch: (search: string) => void;
+}
+
+export default function SearchBar({ search, setSearch, handleSearch }: SearchBarProps) {
 
     return (
         <div className="relative w-full max-w-6xl">

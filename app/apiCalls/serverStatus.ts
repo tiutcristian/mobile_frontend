@@ -1,10 +1,10 @@
-import { getBaseUrl } from "@/lib/utils";
+import { getAPIKey, getBaseUrl } from "@/lib/utils";
 
 export function isServerUp() {
     return fetch(`${getBaseUrl()}/api/v1/heartbeat`, {
         method: 'GET',
         headers: {
-            'x-api-key': 'mobile',
+            'x-api-key': getAPIKey(),
         },
     })
         .then((response) => {

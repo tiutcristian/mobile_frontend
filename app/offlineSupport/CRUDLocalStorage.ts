@@ -1,4 +1,4 @@
-import { getBaseUrl } from "@/lib/utils";
+import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { Listing, LocalStorageAction } from "../types";
 
 export function getLocalListings() {
@@ -94,7 +94,7 @@ function createListingAPICall(listing: Listing) {
     fetch(`${getBaseUrl()}/api/v1/listings/create`, {
         method: 'POST',
         headers: {
-            'x-api-key': 'mobile',
+            'x-api-key': getAPIKey(),
             'Content-Type': 'application/json',
         },
         body: `
@@ -144,7 +144,7 @@ async function updateListingAPICall(listingId: number, updatedListing: Listing) 
     await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
         method: 'PUT',
         headers: {
-            'x-api-key': 'mobile',
+            'x-api-key': getAPIKey(),
             'Content-Type': 'application/json',
         },
         body: `
@@ -175,7 +175,7 @@ function deleteListingAPICall(id: number) {
     fetch(`${getBaseUrl()}/api/v1/listings/${id}`, {
         method: 'DELETE',
         headers: {
-            'x-api-key': 'mobile',
+            'x-api-key': getAPIKey(),
             'Content-Type': 'application/json',
         },
     })

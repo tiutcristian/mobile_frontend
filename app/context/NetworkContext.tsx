@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useReducer, useContext, ReactNode } from "react";
-import { NetworkActionType, Listing, NetworkState, NetworkStateType } from "../types";
+import { NetworkActionType, NetworkState, NetworkStateType } from "../types";
 
 export function networkReducer(state: NetworkStateType, action: NetworkActionType): NetworkStateType {
   switch (action.type) {

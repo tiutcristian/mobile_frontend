@@ -8,38 +8,24 @@ import { useEffect, useState } from "react";
 import { Listing } from "@/app/types";
 import { isServerUp } from "@/app/apiCalls/serverStatus";
 import { getLocalListing } from "@/app/offlineSupport/CRUDLocalStorage";
-import { getBaseUrl } from "@/lib/utils";
+import { getListing } from "@/app/apiCalls/getListing";
 
 export default function Page() {
     let params = useParams();
     const listingId = parseInt(params.id as string);
     const [listing, setListing] = useState<Listing | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
     
     useEffect(() => {
         const fetchListing = async () => {
+            var foundListing: Listing | null = null;
             if (await isServerUp()) {
-                try {
-                    const response = await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
-                        method: 'GET',
-                        headers: {
-                            'x-api-key': 'mobile',
-                        },
-                    });
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch listing');
-                    }
-                    const data = await response.json();
-                    setListing(data);
-                } catch (error) {
-                    setError(error instanceof Error ? error : new Error(String(error)));
-                }
+                await getListing(listingId)
+                    .then((data) => foundListing = data)
+                    .catch((error) => console.error('Error fetching listing:', error));
             } else {
-                const l = getLocalListing(listingId);
-                setListing(l);
+                foundListing = getLocalListing(listingId);
             }
-            setLoading(false);
+            setListing(foundListing);
         };
         fetchListing();
     }
