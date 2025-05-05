@@ -48,3 +48,11 @@ export enum LocalStorageAction {
     UPDATE = "UPDATE",
     DELETE = "DELETE",
 };
+
+export type UserType = {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+}
