@@ -50,7 +50,7 @@ export default function Home() {
 			setPagesLoaded(0);
 			setLoading(false);
 		} else {
-			const localListings = getLocalListings();
+			const localListings = await getLocalListings();
 			setListings(localListings);
 			setLoading(false);
 		}

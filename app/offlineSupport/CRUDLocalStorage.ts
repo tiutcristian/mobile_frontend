@@ -2,7 +2,7 @@
 import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { Listing, LocalStorageAction } from "../types";
 
-export function getLocalListings() {
+export async function getLocalListings() {
     const listings = localStorage.getItem("listings");
     if (listings) {
         return JSON.parse(listings);
@@ -10,8 +10,8 @@ export function getLocalListings() {
     return [];
 }
 
-export function getLocalListing(id: number) {
-    const listings = getLocalListings();
+export async function getLocalListing(id: number) {
+    const listings = await getLocalListings();
     const listing = listings.find((listing: Listing) => listing.id === id);
     if (listing) {
         return listing;
@@ -19,18 +19,18 @@ export function getLocalListing(id: number) {
     return null;
 }
 
-export function setLocalListings(listings: Listing[]) {
+export async function setLocalListings(listings: Listing[]) {
     localStorage.setItem("listings", JSON.stringify(listings));
 }
 
-export function addLocalListing(listing: Listing) {
-    const listings = getLocalListings();
+export async function addLocalListing(listing: Listing) {
+    const listings = await getLocalListings();
     listings.push(listing);
     setLocalListings(listings);
 }
 
-export function updateLocalListing(id: number, updatedListing: Listing) {
-    const listings = getLocalListings();
+export async function updateLocalListing(id: number, updatedListing: Listing) {
+    const listings = await getLocalListings();
     const index = listings.findIndex((listing: Listing) => listing.id === id);
     if (index !== -1) {
         listings[index] = { ...listings[index], ...updatedListing };
@@ -38,13 +38,13 @@ export function updateLocalListing(id: number, updatedListing: Listing) {
     }
 }
 
-export function deleteLocalListing(id: number) {
-    const listings = getLocalListings();
+export async function deleteLocalListing(id: number) {
+    const listings = await getLocalListings();
     const updatedListings = listings.filter((listing: Listing) => listing.id !== id);
     setLocalListings(updatedListings);
 }
 
-export function getActionsQueue() {
+export async function getActionsQueue() {
     const actions = localStorage.getItem("actionsQueue");
     if (actions) {
         return JSON.parse(actions);
@@ -52,18 +52,18 @@ export function getActionsQueue() {
     return [];
 }
 
-export function setActionsQueue(actions: any[]) {
+export async function setActionsQueue(actions: any[]) {
     localStorage.setItem("actionsQueue", JSON.stringify(actions));
 }
 
-export function addActionToQueue(action: LocalStorageAction, payload: any) {
-    const actionsQueue = getActionsQueue();
+export async function addActionToQueue(action: LocalStorageAction, payload: any) {
+    const actionsQueue = await getActionsQueue();
     actionsQueue.push({ action, payload });
     setActionsQueue(actionsQueue);
 }
 
-export function syncQueueChanges() {
-    const actionsQueue = getActionsQueue();
+export async function syncQueueChanges() {
+    const actionsQueue = await getActionsQueue();
     if (actionsQueue.length > 0) {
         actionsQueue.forEach(async (actionObj: any) => {
             switch (actionObj.action) {
@@ -122,9 +122,9 @@ async function createListingAPICall(listing: Listing) {
         }
         return response.json();
     })
-    .then((data) => {
+    .then(async (data) => {
         // update id in local storage
-        const listings = getLocalListings();
+        const listings = await getLocalListings();
         const index = listings.findIndex((listing: Listing) => listing.imageUrl === data.imageUrl);
         if (index !== -1) {
             listings[index].id = data.id;
