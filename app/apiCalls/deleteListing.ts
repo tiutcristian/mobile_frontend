@@ -1,4 +1,3 @@
-'use server';
 import { getBaseUrl, getAPIKey } from '../../lib/utils';
 
 export async function deleteListing(id: number) {

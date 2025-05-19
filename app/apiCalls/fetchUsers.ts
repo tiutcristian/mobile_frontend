@@ -1,4 +1,3 @@
-'use server';
 import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { UserType } from "../types";
 
