@@ -6,12 +6,12 @@ export async function fetchUsersAsync() {
         'page': '0',
         'size': '5',
     });
-    const apiURL = `${getBaseUrl()}/api/v1/users?${params}`;
+    const apiURL = `${await getBaseUrl()}/api/v1/users?${params}`;
     try {
         const response = await fetch(apiURL, {
             method: 'GET',
             headers: {
-                'x-api-key': getAPIKey(),
+                'x-api-key': await getAPIKey(),
             },
         });
         const data = await response.json();

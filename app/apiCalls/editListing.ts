@@ -17,10 +17,10 @@ export function editListing(
     fuelType: FuelType
 ) {
     return new Promise(async (resolve, reject) => {
-        fetch(`${getBaseUrl()}/api/v1/listings/${id}`, {
+        fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
             method: 'PUT',
             headers: {
-                'x-api-key': getAPIKey(),
+                'x-api-key': await getAPIKey(),
                 'Content-Type': 'application/json',
             },
             body:  `

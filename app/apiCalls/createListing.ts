@@ -16,10 +16,10 @@ export function createListing(
     fuelType: FuelType
 ): Promise<Listing> {
     return new Promise(async (resolve, reject) => {
-        fetch(`${getBaseUrl()}/api/v1/listings/create`, {
+        fetch(`${await getBaseUrl()}/api/v1/listings/create`, {
             method: 'POST',
             headers: {
-                'x-api-key': getAPIKey(),
+                'x-api-key': await getAPIKey(),
                 'Content-Type': 'application/json',
             },
             body:  `

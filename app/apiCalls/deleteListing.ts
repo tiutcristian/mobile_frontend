@@ -1,10 +1,10 @@
 import { getBaseUrl, getAPIKey } from '../../lib/utils';
 
 export async function deleteListing(id: number) {
-    await fetch(`${getBaseUrl()}/api/v1/listings/${id}`, {
+    await fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
         method: 'DELETE',
         headers: {
-            'x-api-key': getAPIKey(),
+            'x-api-key': await getAPIKey(),
         },
     })
         .then(async (response) => {

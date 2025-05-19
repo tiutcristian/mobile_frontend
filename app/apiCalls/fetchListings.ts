@@ -2,12 +2,12 @@ import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { Listing } from "../types";
 
 export async function fetchFilteredListings(params: URLSearchParams): Promise<{ data: Listing[]; totalPages: number; } | null> {
-    const apiURL = `${getBaseUrl()}/api/v1/listings/search?${params}`;
+    const apiURL = `${await getBaseUrl()}/api/v1/listings/search?${params}`;
     try {
         const response = await fetch(apiURL, {
             method: 'GET',
             headers: {
-                'x-api-key': getAPIKey(),
+                'x-api-key': await getAPIKey(),
             },
         });
         const data = await response.json();

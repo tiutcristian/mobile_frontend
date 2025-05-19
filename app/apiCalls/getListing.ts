@@ -1,12 +1,12 @@
-import { getBaseUrl } from "@/lib/utils";
+import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { Listing } from "../types";
 
 export function getListing(listingId: number): Promise<Listing | null> {
     return new Promise(async (resolve, reject) => {
-        fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
+        fetch(`${await getBaseUrl()}/api/v1/listings/${listingId}`, {
             method: 'GET',
             headers: {
-                'x-api-key': 'mobile',
+                'x-api-key': await getAPIKey(),
             },
         })
         .then((response) => {

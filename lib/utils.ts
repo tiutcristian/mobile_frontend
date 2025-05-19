@@ -1,11 +1,13 @@
-export function delay(ms: number) {
+'use server';
+
+export async function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function getBaseUrl() {
+export async function getBaseUrl() {
     return process.env.BACKEND_PRIVATE_DOMAIN
 }
 
-export function getAPIKey() {
+export async function getAPIKey() {
     return process.env.API_KEY || ""
 }

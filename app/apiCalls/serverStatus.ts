@@ -1,10 +1,10 @@
 import { getAPIKey, getBaseUrl } from "@/lib/utils";
 
-export function isServerUp() {
-    return fetch(`${getBaseUrl()}/api/v1/heartbeat`, {
+export async function isServerUp() {
+    return fetch(`${await getBaseUrl()}/api/v1/heartbeat`, {
         method: 'GET',
         headers: {
-            'x-api-key': getAPIKey(),
+            'x-api-key': await getAPIKey(),
         },
     })
         .then((response) => {

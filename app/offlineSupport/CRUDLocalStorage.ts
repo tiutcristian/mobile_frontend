@@ -64,20 +64,20 @@ export function addActionToQueue(action: LocalStorageAction, payload: any) {
 export function syncQueueChanges() {
     const actionsQueue = getActionsQueue();
     if (actionsQueue.length > 0) {
-        actionsQueue.forEach((actionObj: any) => {
+        actionsQueue.forEach(async (actionObj: any) => {
             switch (actionObj.action) {
                 case LocalStorageAction.CREATE:
                     const listing: Listing = actionObj.payload;
-                    createListingAPICall(listing);
+                    await createListingAPICall(listing);
                     break;
                 case LocalStorageAction.UPDATE:
                     const updatedListing: Listing = actionObj.payload;
                     const idToUpdate: number = updatedListing.id;
-                    updateListingAPICall(idToUpdate, updatedListing);
+                    await updateListingAPICall(idToUpdate, updatedListing);
                     break;
                 case LocalStorageAction.DELETE:
                     const idToDelete: number = actionObj.payload;
-                    deleteListingAPICall(idToDelete);
+                    await deleteListingAPICall(idToDelete);
                     break;
                 default:
                     break;
@@ -90,11 +90,11 @@ export function syncQueueChanges() {
 
 
 
-function createListingAPICall(listing: Listing) {
-    fetch(`${getBaseUrl()}/api/v1/listings/create`, {
+async function createListingAPICall(listing: Listing) {
+    fetch(`${await getBaseUrl()}/api/v1/listings/create`, {
         method: 'POST',
         headers: {
-            'x-api-key': getAPIKey(),
+            'x-api-key': await getAPIKey(),
             'Content-Type': 'application/json',
         },
         body: `
@@ -141,10 +141,10 @@ function createListingAPICall(listing: Listing) {
 
 
 async function updateListingAPICall(listingId: number, updatedListing: Listing) {
-    await fetch(`${getBaseUrl()}/api/v1/listings/${listingId}`, {
+    await fetch(`${await getBaseUrl()}/api/v1/listings/${listingId}`, {
         method: 'PUT',
         headers: {
-            'x-api-key': getAPIKey(),
+            'x-api-key': await getAPIKey(),
             'Content-Type': 'application/json',
         },
         body: `
@@ -171,11 +171,11 @@ async function updateListingAPICall(listingId: number, updatedListing: Listing) 
 
 
 
-function deleteListingAPICall(id: number) {
-    fetch(`${getBaseUrl()}/api/v1/listings/${id}`, {
+async function deleteListingAPICall(id: number) {
+    fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
         method: 'DELETE',
         headers: {
-            'x-api-key': getAPIKey(),
+            'x-api-key': await getAPIKey(),
             'Content-Type': 'application/json',
         },
     })
