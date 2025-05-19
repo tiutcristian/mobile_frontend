@@ -1,17 +1,13 @@
-import SETTINGS from "../settings.json";
-
 export function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function getBaseUrl() {
-    const API_ADDRESS = SETTINGS.API_ADDRESS;
-    const API_PORT = SETTINGS.API_PORT;
-
-    // return `http://${API_ADDRESS}:${API_PORT}`;    
-    return `http://localhost:8080`;
+    console.log('process.env.BACKEND_PRIVATE_DOMAIN', process.env.BACKEND_PRIVATE_DOMAIN)
+    return process.env.BACKEND_PRIVATE_DOMAIN
 }
 
 export function getAPIKey() {
-    return SETTINGS.API_KEY;
+    console.log('process.env.API_KEY', process.env.API_KEY)
+    return process.env.API_KEY
 }
