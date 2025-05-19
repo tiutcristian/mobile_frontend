@@ -2,7 +2,7 @@
 import { getBaseUrl, getAPIKey } from "@/lib/utils";
 import { FuelType, Listing, Transmission } from "../types";
 
-export function createListing(
+export async function createListing(
     image: string,
     title: string,
     price: number,

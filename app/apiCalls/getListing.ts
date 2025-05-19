@@ -2,7 +2,7 @@
 import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { Listing } from "../types";
 
-export function getListing(listingId: number): Promise<Listing | null> {
+export async function getListing(listingId: number): Promise<Listing | null> {
     return new Promise(async (resolve, reject) => {
         fetch(`${await getBaseUrl()}/api/v1/listings/${listingId}`, {
             method: 'GET',
