@@ -1,6 +1,7 @@
-'use server';
-import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { Listing, LocalStorageAction } from "../types";
+import { createListing } from "../apiCalls/createListing";
+import { editListing } from "../apiCalls/editListing";
+import { deleteListing } from "../apiCalls/deleteListing";
 
 export async function getLocalListings() {
     const listings = localStorage.getItem("listings");
@@ -92,46 +93,28 @@ export async function syncQueueChanges() {
 
 
 async function createListingAPICall(listing: Listing) {
-    fetch(`${await getBaseUrl()}/api/v1/listings/create`, {
-        method: 'POST',
-        headers: {
-            'x-api-key': await getAPIKey(),
-            'Content-Type': 'application/json',
-        },
-        body: `
-            {
-                "userId": 1,
-                "imageUrl": "${listing.imageUrl}",
-                "title": "${listing.title}",
-                "price": ${listing.price},
-                "make": "${listing.make}",
-                "model": "${listing.model}",
-                "description": "${listing.description}",
-                "year": ${listing.year},
-                "mileage": ${listing.mileage},
-                "engineSize": ${listing.engineSize},
-                "horsepower": ${listing.horsepower},
-                "transmission": "${listing.transmission}",
-                "fuelType": "${listing.fuelType}"
-            }
-        `,
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error('Failed to create listing');
-        }
-        return response.json();
-    })
+    await createListing(
+        listing.imageUrl,
+        listing.title,
+        listing.price,
+        listing.make,
+        listing.model,
+        listing.description,
+        listing.year,
+        listing.mileage,
+        listing.engineSize,
+        listing.horsepower,
+        listing.transmission,
+        listing.fuelType
+    )
     .then(async (data) => {
         // update id in local storage
         const listings = await getLocalListings();
-        const index = listings.findIndex((listing: Listing) => listing.imageUrl === data.imageUrl);
+        const index = listings.findIndex((listing: Listing) => listing.title === data.title);
         if (index !== -1) {
             listings[index].id = data.id;
             setLocalListings(listings);
         }
-        // redirect to the listing view page
-        window.location.href = `/listing/${data.id}/view`;
     })
     .catch((error) => {
         console.error('Error creating listing:', error);
@@ -142,51 +125,26 @@ async function createListingAPICall(listing: Listing) {
 
 
 async function updateListingAPICall(listingId: number, updatedListing: Listing) {
-    await fetch(`${await getBaseUrl()}/api/v1/listings/${listingId}`, {
-        method: 'PUT',
-        headers: {
-            'x-api-key': await getAPIKey(),
-            'Content-Type': 'application/json',
-        },
-        body: `
-            {
-                "id": ${listingId},
-                "userId": 1,
-                "imageUrl": "${updatedListing.imageUrl}",
-                "title": "${updatedListing.title}",
-                "price": ${updatedListing.price},
-                "make": "${updatedListing.make}",
-                "model": "${updatedListing.model}",
-                "description": "${updatedListing.description}",
-                "year": ${updatedListing.year},
-                "mileage": ${updatedListing.mileage},
-                "engineSize": ${updatedListing.engineSize},
-                "horsepower": ${updatedListing.horsepower},
-                "transmission": "${updatedListing.transmission}",
-                "fuelType": "${updatedListing.fuelType}"
-            }
-        `,
-    });
+    await editListing(
+        listingId,
+        updatedListing.imageUrl,
+        updatedListing.title,
+        updatedListing.price,
+        updatedListing.make,
+        updatedListing.model,
+        updatedListing.description,
+        updatedListing.year,
+        updatedListing.mileage,
+        updatedListing.engineSize,
+        updatedListing.horsepower,
+        updatedListing.transmission,
+        updatedListing.fuelType
+    );
 }
 
 
 
 
 async function deleteListingAPICall(id: number) {
-    fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'x-api-key': await getAPIKey(),
-            'Content-Type': 'application/json',
-        },
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error('Failed to delete listing');
-        }
-    })
-    .catch((error) => {
-        console.error('Error deleting listing:', error);
-        alert('Failed to delete listing. Please try again.');
-    });
+    await deleteListing(id);
 }
