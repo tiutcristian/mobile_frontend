@@ -1,3 +1,4 @@
+'use server';
 import { getAPIKey, getBaseUrl } from "@/lib/utils";
 import { Listing } from "../types";
 

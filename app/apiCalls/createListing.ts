@@ -1,3 +1,4 @@
+'use server';
 import { getBaseUrl, getAPIKey } from "@/lib/utils";
 import { FuelType, Listing, Transmission } from "../types";
 

@@ -1,3 +1,4 @@
+'use server';
 import { getAPIKey, getBaseUrl } from "@/lib/utils";
 
 export async function isServerUp() {
