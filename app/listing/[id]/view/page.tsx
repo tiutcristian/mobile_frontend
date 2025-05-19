@@ -23,7 +23,7 @@ export default function Page() {
                     .then((data) => foundListing = data)
                     .catch((error) => console.error('Error fetching listing:', error));
             } else {
-                foundListing = getLocalListing(listingId);
+                foundListing = await getLocalListing(listingId);
             }
             setListing(foundListing);
         };

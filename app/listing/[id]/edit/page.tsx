@@ -37,7 +37,7 @@ export default function Form() {
 				.then((data) => foundListing = data)
 				.catch((error) => console.error('Error fetching listing:', error));
 			} else {
-				foundListing = getLocalListing(listingId);
+				foundListing = await getLocalListing(listingId);
 			}
 			if (foundListing) {
 				setListing(foundListing);
