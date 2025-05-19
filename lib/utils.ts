@@ -5,7 +5,7 @@ export async function delay(ms: number) {
 }
 
 export async function getBaseUrl() {
-    return `https://${process.env.BACKEND_PRIVATE_DOMAIN}`
+    return process.env.BACKEND_URL
 }
 
 export async function getAPIKey() {
