@@ -8,6 +8,6 @@ export async function getBaseUrl() {
     return process.env.BACKEND_URL
 }
 
-export async function getAPIKey() {
-    return process.env.API_KEY || ""
+export async function getJWTSecret() {
+    return process.env.JWT_SECRET;
 }

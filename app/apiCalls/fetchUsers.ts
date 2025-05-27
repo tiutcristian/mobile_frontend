@@ -1,4 +1,4 @@
-import { getAPIKey, getBaseUrl } from "@/lib/utils";
+import { getBaseUrl, getJWTSecret } from "@/lib/utils";
 import { UserType } from "../types";
 
 export async function fetchUsersAsync() {
@@ -11,8 +11,9 @@ export async function fetchUsersAsync() {
         const response = await fetch(apiURL, {
             method: 'GET',
             headers: {
-                'x-api-key': await getAPIKey(),
-            },
+                'Authorization': `Bearer ${await getJWTSecret()}`,
+                'Content-Type': 'application/json'
+            }
         });
         const data = await response.json();
         if (!response.ok) {

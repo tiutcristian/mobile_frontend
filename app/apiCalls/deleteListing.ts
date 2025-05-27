@@ -1,10 +1,11 @@
-import { getBaseUrl, getAPIKey } from '../../lib/utils';
+import { getBaseUrl, getJWTSecret } from '../../lib/utils';
 
 export async function deleteListing(id: number) {
     await fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
         method: 'DELETE',
         headers: {
-            'x-api-key': await getAPIKey(),
+            'Authorization': `Bearer ${await getJWTSecret()}`,
+            'Content-Type': 'application/json',
         },
     })
         .then(async (response) => {

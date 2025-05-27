@@ -1,4 +1,4 @@
-import { getAPIKey, getBaseUrl } from "@/lib/utils";
+import { getBaseUrl, getJWTSecret } from "@/lib/utils";
 import { Listing } from "../types";
 
 export async function fetchFilteredListings(params: URLSearchParams): Promise<{ data: Listing[]; totalPages: number; } | null> {
@@ -7,8 +7,8 @@ export async function fetchFilteredListings(params: URLSearchParams): Promise<{ 
         const response = await fetch(apiURL, {
             method: 'GET',
             headers: {
-                'x-api-key': await getAPIKey(),
-            },
+                'Authorization': `Bearer ${await getJWTSecret()}`
+            }
         });
         const data = await response.json();
         if (!response.ok) {

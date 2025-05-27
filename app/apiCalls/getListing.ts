@@ -1,4 +1,4 @@
-import { getAPIKey, getBaseUrl } from "@/lib/utils";
+import { getBaseUrl, getJWTSecret } from "@/lib/utils";
 import { Listing } from "../types";
 
 export async function getListing(listingId: number): Promise<Listing | null> {
@@ -6,8 +6,8 @@ export async function getListing(listingId: number): Promise<Listing | null> {
         fetch(`${await getBaseUrl()}/api/v1/listings/${listingId}`, {
             method: 'GET',
             headers: {
-                'x-api-key': await getAPIKey(),
-            },
+                'Authorization': `Bearer ${await getJWTSecret()}`
+            }
         })
         .then((response) => {
             if (!response.ok) {

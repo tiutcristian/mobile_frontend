@@ -1,4 +1,4 @@
-import { getBaseUrl, getAPIKey } from "@/lib/utils";
+import { getBaseUrl, getJWTSecret } from "@/lib/utils";
 import { FuelType, Listing, Transmission } from "../types";
 
 export async function createListing(
@@ -19,7 +19,7 @@ export async function createListing(
         fetch(`${await getBaseUrl()}/api/v1/listings/create`, {
             method: 'POST',
             headers: {
-                'x-api-key': await getAPIKey(),
+                'Authorization': `Bearer ${await getJWTSecret()}`,
                 'Content-Type': 'application/json',
             },
             body:  `

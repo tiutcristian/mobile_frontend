@@ -1,4 +1,4 @@
-import { getAPIKey, getBaseUrl } from "@/lib/utils";
+import { getBaseUrl, getJWTSecret } from "@/lib/utils";
 import { FuelType, Transmission } from "../types";
 
 export async function editListing(
@@ -20,7 +20,7 @@ export async function editListing(
         fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
             method: 'PUT',
             headers: {
-                'x-api-key': await getAPIKey(),
+                'Authorization': `Bearer ${await getJWTSecret()}`,
                 'Content-Type': 'application/json',
             },
             body:  `

@@ -1,11 +1,8 @@
-import { getAPIKey, getBaseUrl } from "@/lib/utils";
+import { getBaseUrl, getJWTSecret } from "@/lib/utils";
 
 export async function isServerUp() {
     return fetch(`${await getBaseUrl()}/api/v1/heartbeat`, {
         method: 'GET',
-        headers: {
-            'x-api-key': await getAPIKey(),
-        },
     })
         .then((response) => {
             if (!response.ok) {
