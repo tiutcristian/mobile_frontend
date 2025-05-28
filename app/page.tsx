@@ -13,6 +13,7 @@ import { deleteListing } from './apiCalls/deleteListing';
 import { useInView } from 'react-intersection-observer';
 import { delay } from '@/lib/utils';
 import SearchBar from '@/components/SearchBar';
+import SimpleListingCard from '@/components/SimpleListingCard';
 
 
 export default function Home() {
@@ -124,10 +125,9 @@ export default function Home() {
 				<>
 					<div className="flex flex-col gap-8 w-full max-w-6xl">
 						{listings.map((listing) => (
-							<ListingCard
+							<SimpleListingCard
 								key={listing.id}
 								listing={listing}
-								handleDelete={handleDelete}
 							/>
 						))}
 					</div>
