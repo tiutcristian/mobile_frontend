@@ -46,9 +46,9 @@ export async function registerUser(firstName: string, lastName: string, phone: s
                 }
             `,
         })
-        .then((response) => {
+        .then(async (response) => {
             if (!response.ok) {
-                throw new Error('Registration failed');
+                throw new Error(await response.text());
             }
             return response.text();
         })

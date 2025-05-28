@@ -19,7 +19,7 @@ export default function Register() {
 					}
 					)
 					.catch((error) => {
-						alert('Error registering: ' + error.message);
+						alert(error.message);
 					}
 				);
     }
