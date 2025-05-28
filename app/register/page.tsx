@@ -1,10 +1,27 @@
 "use client";
 import { FormEvent } from "react";
+import { registerUser } from "../apiCalls/authentication";
 
 export default function Register() {
 
     function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-        throw new Error("Function not implemented.");
+				event.preventDefault();
+				const formData = new FormData(event.currentTarget);
+				const firstName = formData.get('firstName') as string;
+				const lastName = formData.get('lastName') as string;
+				const phone = formData.get('phone') as string;
+				const email = formData.get('email') as string;
+				const password = formData.get('password') as string;
+
+				registerUser(firstName, lastName, phone, email, password)
+					.then(() => {
+						window.location.href = '/login';
+					}
+					)
+					.catch((error) => {
+						alert('Error registering: ' + error.message);
+					}
+				);
     }
 
     return (
@@ -110,7 +127,7 @@ export default function Register() {
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Sign in
+                Register
               </button>
             </div>
           </form>
