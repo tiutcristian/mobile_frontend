@@ -26,3 +26,24 @@ export async function fetchUsersAsync() {
         return null;
     }
 }
+
+export async function getUserByEmail(email: string): Promise<UserType | null> {
+    const apiURL = `${await getBaseUrl()}/api/v1/users/search?email=${email}`;
+    try {
+        const response = await fetch(apiURL, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch user by email');
+        }
+        const data = await response.json();
+        return data as UserType;
+    } catch (error) {
+        console.error('Error fetching user by email:', error);
+        return null;
+    }
+}
