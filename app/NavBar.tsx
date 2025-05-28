@@ -56,9 +56,14 @@ export default function NavBar() {
                         </a>
                         {
                             isLoggedIn ?
-                                <a href="/logout" className="text-gray-300 hover:text-white ml-4">
-                                    Logout
-                                </a>
+                                <>
+                                    <a href="/my-listings" className="text-gray-300 hover:text-white ml-4">
+                                        My Listings
+                                    </a>
+                                    <a href="/logout" className="text-gray-300 hover:text-white ml-4">
+                                        Logout
+                                    </a>
+                                </>
                             :
                                 <>
                                     <a href="/login" className="text-gray-300 hover:text-white ml-4">
