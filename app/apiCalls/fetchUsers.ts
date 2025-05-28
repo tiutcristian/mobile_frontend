@@ -1,5 +1,6 @@
-import { getBaseUrl, getJWTSecret } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/utils";
 import { UserType } from "../types";
+import { getToken } from "@/lib/localStorageUtils";
 
 export async function fetchUsersAsync() {
     const params = new URLSearchParams({
@@ -11,7 +12,7 @@ export async function fetchUsersAsync() {
         const response = await fetch(apiURL, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${await getJWTSecret()}`,
+                'Authorization': `Bearer ${getToken()}`,
                 'Content-Type': 'application/json'
             }
         });

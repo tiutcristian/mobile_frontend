@@ -7,7 +7,3 @@ export async function delay(ms: number) {
 export async function getBaseUrl() {
     return process.env.BACKEND_URL
 }
-
-export async function getJWTSecret() {
-    return process.env.JWT_SECRET;
-}

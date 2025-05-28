@@ -1,5 +1,6 @@
-import { getBaseUrl, getJWTSecret } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/utils";
 import { FuelType, Transmission } from "../types";
+import { getToken } from "@/lib/localStorageUtils";
 
 export async function editListing(
     id: number,
@@ -20,7 +21,7 @@ export async function editListing(
         fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
             method: 'PUT',
             headers: {
-                'Authorization': `Bearer ${await getJWTSecret()}`,
+                'Authorization': `Bearer ${getToken()}`,
                 'Content-Type': 'application/json',
             },
             body:  `

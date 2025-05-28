@@ -1,4 +1,4 @@
-import { getBaseUrl, getJWTSecret } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/utils";
 
 export async function isServerUp() {
     return fetch(`${await getBaseUrl()}/api/v1/heartbeat`, {

@@ -1,5 +1,6 @@
-import { getBaseUrl, getJWTSecret } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/utils";
 import { FuelType, Listing, Transmission } from "../types";
+import { getToken } from "@/lib/localStorageUtils";
 
 export async function createListing(
     image: string,
@@ -19,7 +20,7 @@ export async function createListing(
         fetch(`${await getBaseUrl()}/api/v1/listings/create`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${await getJWTSecret()}`,
+                'Authorization': `Bearer ${getToken()}`,
                 'Content-Type': 'application/json',
             },
             body:  `

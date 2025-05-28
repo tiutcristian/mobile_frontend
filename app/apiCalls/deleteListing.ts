@@ -1,10 +1,11 @@
-import { getBaseUrl, getJWTSecret } from '../../lib/utils';
+import { getToken } from '@/lib/localStorageUtils';
+import { getBaseUrl } from '../../lib/utils';
 
 export async function deleteListing(id: number) {
     await fetch(`${await getBaseUrl()}/api/v1/listings/${id}`, {
         method: 'DELETE',
         headers: {
-            'Authorization': `Bearer ${await getJWTSecret()}`,
+            'Authorization': `Bearer ${getToken()}`,
             'Content-Type': 'application/json',
         },
     })
