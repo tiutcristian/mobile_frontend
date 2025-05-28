@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Listing, LocalStorageAction, UserType } from './types';
+import { Listing, LocalStorageAction } from './types';
 import ListingCard from '@/components/ListingCard';
 import { addActionToQueue, deleteLocalListing, getLocalListings, setLocalListings } from './offlineSupport/CRUDLocalStorage';
 import { isServerUp } from './apiCalls/serverStatus';
@@ -12,9 +12,7 @@ import { fetchFilteredListings } from './apiCalls/fetchListings';
 import { deleteListing } from './apiCalls/deleteListing';
 import { useInView } from 'react-intersection-observer';
 import { delay } from '@/lib/utils';
-import ButtonGroup from '@/components/ButtonGroup';
 import SearchBar from '@/components/SearchBar';
-import { fetchUsersAsync } from './apiCalls/fetchUsers';
 
 
 export default function Home() {
@@ -24,13 +22,10 @@ export default function Home() {
 	const [loading, setLoading] = useState(true);
 	const [pagesLoaded, setPagesLoaded] = useState(0);
 	const [totalPages, setTotalPages] = useState(0);
-	const [usersList, setUsersList] = useState<UserType[]>([]);
-	const [currentUser, setCurrentUser] = useState<UserType>();
     const { ref, inView } = useInView();
 
 	const fetchListings = async (page: number, size: number) => {
 		const params = new URLSearchParams({
-			'userId': currentUser?.id?.toString() || '1',
 			'page': page.toString(),
 			'size': size.toString()
 		});
@@ -74,17 +69,6 @@ export default function Home() {
 
 	useEffect(() => {
 		fetchData();
-	}, [currentUser]);
-
-	useEffect(() => {
-		const fetchUsers = async () => {
-			if (await isServerUp()) {
-				const fetchedUsers = await fetchUsersAsync();
-				setUsersList(fetchedUsers || []);
-				setCurrentUser(fetchedUsers ? fetchedUsers[0] : undefined);
-			}
-		};
-		fetchUsers();
 	}, []);
 
 	const handleDelete = async (id: number) => {
@@ -115,12 +99,7 @@ export default function Home() {
 	}
 
 	return (
-		<main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
-			<ButtonGroup
-				children={usersList.map((user) => (user.firstName + ' ' + user.lastName))}
-				onClick={index => setCurrentUser(usersList[index])}
-			/>
-			
+		<main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">			
 			<SearchBar 
 				search={search}
 				setSearch={setSearch}
@@ -135,9 +114,9 @@ export default function Home() {
 			</Link>
 			
 
-			{listings.length === 0 && (
+			{listings.length === 0 && !loading && (
 				<h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-					No listings found
+					No listings yet. Create one to get started!
 				</h1>
 			)}
 
