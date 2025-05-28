@@ -4,10 +4,12 @@ import { useNetworkContext } from "./context/NetworkContext";
 import { NetworkState } from "./types";
 import { isServerUp } from "./apiCalls/serverStatus";
 import { syncQueueChanges } from "./offlineSupport/CRUDLocalStorage";
+import { getToken } from "@/lib/localStorageUtils";
 
 export default function NavBar() {
     const { state: nextworkState, dispatch: networkDispatch } = useNetworkContext();
     const [navClass, setNavClass] = useState("bg-gray-800 p-4");
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         const interval = setInterval(async () =>  {
@@ -28,6 +30,11 @@ export default function NavBar() {
         }, 3000); // check every 3 seconds
         return () => clearInterval(interval);
     }, []);
+    
+    useEffect(() => {
+        const token = getToken();
+        setIsLoggedIn(!!token);
+    }, []);
 
     return (
         <nav className={navClass}>
@@ -47,6 +54,21 @@ export default function NavBar() {
                         <a href="/" className="text-gray-300 hover:text-white">
                             Home
                         </a>
+                        {
+                            isLoggedIn ?
+                                <a href="/logout" className="text-gray-300 hover:text-white ml-4">
+                                    Logout
+                                </a>
+                            :
+                                <>
+                                    <a href="/login" className="text-gray-300 hover:text-white ml-4">
+                                        Login
+                                    </a>
+                                    <a href="/register" className="text-gray-300 hover:text-white ml-4">
+                                        Register
+                                    </a>
+                                </> 
+                        }
                     </li>
                 </ul>
             </div>
