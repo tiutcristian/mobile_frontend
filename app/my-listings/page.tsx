@@ -131,13 +131,7 @@ export default function MyListingsPage() {
 
     return (
 
-        <main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">
-			<div className="container mx-auto p-4">
-                <h1 className="text-2xl font-bold mb-4">My Listings</h1>
-                <p className="text-gray-600">This page will display your listings.</p>
-                <p className="text-gray-600">You are {currentUser?.firstName} {currentUser?.lastName}</p>
-            </div>
-			
+        <main className="p-8 pb-20 sm:p-20 font-sans flex flex-col items-center gap-8">		
 			<SearchBar 
 				search={search}
 				setSearch={setSearch}
