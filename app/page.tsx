@@ -103,7 +103,7 @@ export default function Home() {
 
 			{listings.length === 0 && !loading && (
 				<h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-					No listings yet. Create one to get started!
+					No listings found
 				</h1>
 			)}
 

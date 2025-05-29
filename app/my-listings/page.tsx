@@ -146,7 +146,7 @@ export default function MyListingsPage() {
 
 			{listings.length === 0 && (
 				<h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-					No listings found
+					You have no listings yet. Create one to get started!
 				</h1>
 			)}
 
