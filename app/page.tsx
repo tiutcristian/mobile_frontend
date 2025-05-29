@@ -1,17 +1,12 @@
 'use client';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Listing, LocalStorageAction } from './types';
-import ListingCard from '@/components/ListingCard';
 import { addActionToQueue, deleteLocalListing, getLocalListings, setLocalListings } from './offlineSupport/CRUDLocalStorage';
 import { isServerUp } from './apiCalls/serverStatus';
 import { Spinner } from '@/components/Spinner';
 import { fetchFilteredListings } from './apiCalls/fetchListings';
 import { deleteListing } from './apiCalls/deleteListing';
 import { useInView } from 'react-intersection-observer';
-import { delay } from '@/lib/utils';
 import SearchBar from '@/components/SearchBar';
 import SimpleListingCard from '@/components/SimpleListingCard';
 
@@ -53,7 +48,6 @@ export default function Home() {
 	};
 
 	const fetchMoreListings = async (size: number) => {
-        await delay(500);
         const nextPage = pagesLoaded + 1;
 		var newListings = await fetchListings(nextPage, size);
 		console.log('Fetched page:', nextPage);

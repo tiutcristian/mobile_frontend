@@ -1,13 +1,12 @@
 "use client";
 import { getToken } from "@/lib/localStorageUtils";
-import { ReactNode, use, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Listing, LocalStorageAction, UserType } from "../types";
 import { getUserByEmail } from "../apiCalls/fetchUsers";
 import { useInView } from "react-intersection-observer";
 import { fetchFilteredListings } from "../apiCalls/fetchListings";
 import { isServerUp } from "../apiCalls/serverStatus";
 import { addActionToQueue, deleteLocalListing, getLocalListings, setLocalListings } from "../offlineSupport/CRUDLocalStorage";
-import { delay } from "@/lib/utils";
 import { deleteListing } from "../apiCalls/deleteListing";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
@@ -83,7 +82,6 @@ export default function MyListingsPage() {
 	};
 
 	const fetchMoreListings = async (size: number) => {
-        await delay(500);
         const nextPage = pagesLoaded + 1;
 		var newListings = await fetchListings(nextPage, size);
 		console.log('Fetched page:', nextPage);
