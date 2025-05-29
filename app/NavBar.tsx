@@ -40,7 +40,7 @@ export default function NavBar() {
         <nav className={navClass}>
             <div className="container mx-auto flex justify-between items-center">
                 <div className="text-white text-lg font-semibold w-1/3 justify-start">
-                    Mobile RO Web App
+                    SamsaRO
                 </div>
                 <span className="text-red-700 w-1/3 text-center">
                     {nextworkState.networkState !== NetworkState.UP ?

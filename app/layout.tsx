@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mobile RO Web App",
+  title: "SamsaRO"
 };
 
 export default function RootLayout({
