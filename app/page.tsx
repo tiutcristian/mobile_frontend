@@ -105,15 +105,7 @@ export default function Home() {
 				search={search}
 				setSearch={setSearch}
 				handleSearch={fetchData}
-			/>
-
-			<Link 
-				className="fixed bottom-8 right-8 bg-blue-700 hover:bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer"
-				href="/create-listing"
-			>
-				<FontAwesomeIcon icon={faPlus} className="text-2xl" />
-			</Link>
-			
+			/>			
 
 			{listings.length === 0 && !loading && (
 				<h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
