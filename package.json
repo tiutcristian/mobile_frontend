@@ -23,6 +23,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-intersection-observer": "^9.16.0",
+    "react-qrcode-logo": "^3.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.4.0",
     "simple-datatables": "^10.0.0",
