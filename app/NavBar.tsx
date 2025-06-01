@@ -60,6 +60,9 @@ export default function NavBar() {
                                     <a href="/my-listings" className="text-gray-300 hover:text-white ml-4">
                                         My Listings
                                     </a>
+                                    <a href="/2fa/status" className="text-gray-300 hover:text-white ml-4">
+                                        Two-Factor Authentication
+                                    </a>
                                     <a href="/logout" className="text-gray-300 hover:text-white ml-4">
                                         Logout
                                     </a>

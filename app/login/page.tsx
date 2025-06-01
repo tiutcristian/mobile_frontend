@@ -11,8 +11,13 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
 
 	await loginUser(email, password)
 		.then((token) => {
-			setToken(token);
-			window.location.href = '/';
+      if (token === "2FA_REQUIRED") {
+        localStorage.setItem('email', email);
+        window.location.href = '/2fa/verify';
+      } else {
+        setToken(token);
+			  window.location.href = '/';
+      }
 		})
 		.catch((error) => {
 			alert('Error logging in: ' + error.message);
