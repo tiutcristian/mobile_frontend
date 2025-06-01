@@ -15,9 +15,9 @@ export async function loginUser(email: string, password: string): Promise<string
                 }
             `,
         })
-        .then((response) => {
+        .then(async (response) => {
             if (!response.ok) {
-                throw new Error('Login failed');
+                throw new Error(`Login failed: ${await response.text()}`);
             }
             return response.text();
         })

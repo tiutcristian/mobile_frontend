@@ -1,29 +1,7 @@
 "use client";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { loginUser } from "../apiCalls/authentication";
 import { setToken } from "@/lib/localStorageUtils";
-
-async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-	event.preventDefault();
-	const formData = new FormData(event.currentTarget);
-	const email = formData.get('email') as string;
-	const password = formData.get('password') as string;
-
-	await loginUser(email, password)
-		.then((token) => {
-      if (token === "2FA_REQUIRED") {
-        localStorage.setItem('email', email);
-        window.location.href = '/2fa/verify';
-      } else {
-        setToken(token);
-			  window.location.href = '/';
-      }
-		})
-		.catch((error) => {
-			alert('Error logging in: ' + error.message);
-		}
-	);
-}
 
 export default function Login() {
 	// if already logged in, redirect to home
@@ -31,6 +9,30 @@ export default function Login() {
 		window.location.href = '/';
 		return null; // Prevent rendering the component
 	}
+
+  const [message, setMessage] = useState<string>("");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    await loginUser(email, password)
+      .then((token) => {
+        if (token === "2FA_REQUIRED") {
+          localStorage.setItem('email', email);
+          window.location.href = '/2fa/verify';
+        } else {
+          setToken(token);
+          window.location.href = '/';
+        }
+      })
+      .catch((error) => {
+        setMessage(error.message || "An error occurred during login. Please try again.");
+      }
+    );
+  }
 
 	// if not logged in, render the login form
   return(
@@ -95,6 +97,9 @@ export default function Login() {
             <a href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
               Create an account
             </a>
+          </p>
+          <p className="mt-2 text-center text-sm/6 text-red-500">
+            {message}
           </p>
         </div>
       </div>
