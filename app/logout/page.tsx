@@ -1,11 +1,10 @@
 "use client";
 import { removeToken } from "@/lib/localStorageUtils";
 
-export default function handleLogout() {
-    removeToken();
-    localStorage.removeItem('email');
-    
+export default function handleLogout() {    
     if (typeof window !== 'undefined') {
+        removeToken();
+        localStorage.removeItem('email');
         window.location.href = '/';
     }
 }
