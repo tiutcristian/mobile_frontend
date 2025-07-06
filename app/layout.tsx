@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SamsaRO"
+  title: "Mobile Clone"
 };
 
 export default function RootLayout({
